@@ -1,0 +1,192 @@
+---
+title: "Simple Normal Regression Analysis"
+author: "r Sys.info()[['effective_user']]"
+date: "`r Sys.time()`"
+output: html_document
+params:
+  dataset: !r tibble::tibble()
+  dependent_var: ""
+  independent_var: ""
+  n_chains: 4
+  n_iter: 10000
+  ci_pct: 95
+  posterior_prob: !r c()
+  posterior_predict: !r c()
+  
+---
+
+# Parameters
+1. Dataset: params$dataset
+2. Depedent Variable: params$dependent_var
+3. Independent Variable: params$independent_var
+4. Number of stan chains: params$n_chains
+5. Number of chain iterations: params$n_iter
+6. Percentage to use in Credible Interval: params$ci_pct
+7. Vector of relationships to calculate the posterior probability for (e.g. dependent variable > 1.2)
+8. Vector of depdent variable values to predict indepdent variable values from (e.g. dependent variable = 5, what is potential model)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(rstanarm)
+library(bayesplot)
+library(reshape2)
+library(janitor)
+```
+
+### Practice Q1: part a
+Loading in the data frame
+```{r include=FALSE}
+bikes <- read.csv("bikes.csv")
+```
+
+### Practice Q1: part b
+```{r}
+ggplot(bikes, aes(x = temp_actual, y = rides)) + geom_point()
+```
+
+### Practice Q1: part c
+Building our model 
+
+```{r message=FALSE, results="hide"}
+
+set.seed(84735)
+normal_model_sim <- stan_glm(rides ~ temp_actual, 
+                             data = bikes,
+                             family = gaussian,
+                             chains = 4,
+                             iter = 5000*2)
+
+```
+
+### Practice Q1: part d
+Diagnostics
+```{r}
+
+# Trace plots of parallel chains
+mcmc_trace(normal_model_sim, size = 0.1)
+
+# Density plots of parallel chains
+mcmc_dens_overlay(normal_model_sim)
+```
+
+### Practice Q1: part e
+Interpreting the Posteriors
+```{r}
+# Posterior summary statistics
+model_summary <- summary(normal_model_sim)
+head(as.data.frame(model_summary), -2)
+```
+
+best guess for regression equation:
+predicted rides = -2173.12 + 89.31*temp_actual
+
+### Practice Q1: part f
+Credible interval (90%)
+
+```{r}
+posterior_interval(normal_model_sim, prob = 0.90)
+```
+
+```{r}
+
+# Shade in the 90% CI. For example:
+mcmc_areas(normal_model_sim,
+           pars = c("temp_actual"),
+           prob = 0.90,
+           point_est="mean")
+```
+
+### Practice Q1: part g
+
+Creating a dataframe where the chains for each parameter are in one column
+
+```{r}
+
+normal_model_df <- as.array(normal_model_sim) %>%
+melt %>%
+pivot_wider(names_from = parameters, values_from = value)
+```
+
+
+### Practice Q1: part h
+
+plotting the first 20 regression lines with the posterior mean regression line overlayed in blue
+```{r}
+first_20 <- head(normal_model_df, 20)
+
+ggplot(bikes, aes(x = temp_actual, y = rides)) +
+  geom_point(size = 0.1) +
+  geom_abline(data = first_20,
+              aes(intercept = `(Intercept)`, 
+                  slope = temp_actual),
+              color = "orange",alpha=.8, size = 0.1) +
+  # mean intercept and slope from model_summary
+  geom_abline(aes(intercept = -2173.12, slope = 89.31),
+              color = "blue")
+```
+
+We can also do this with first 200
+
+```{r}
+first_200 <- head(normal_model_df, 200)
+
+ggplot(bikes, aes(x = temp_actual, y = rides)) +
+  geom_point(size = 0.1) +
+  geom_abline(data = first_200,
+              aes(intercept = `(Intercept)`, 
+                  slope = temp_actual),
+              # use smaller alpha value with more lines
+              color = "orange",alpha=.3, size = 0.1) +
+  # mean intercept and slope from model_summary
+  geom_abline(aes(intercept = -2173.12, slope = 89.31),
+              color = "blue")
+```
+
+
+### Practice Q1: part i
+Finding posterior probability that beta1>0
+
+```{r}
+
+normal_model_df %>%
+  mutate(exceeds_0 = temp_actual > 0) %>%
+  tabyl(exceeds_0)
+```
+
+
+### Practice Q1: part j (the non stan way)
+
+make posterior predictions for when the temp is 58 degrees
+```{r}
+set.seed(84735)
+predict_58 <- normal_model_df %>%
+  mutate(y_trend = `(Intercept)` + temp_actual*58) %>%
+  mutate(y_new = rnorm(20000, y_trend, sigma))
+```
+
+
+visualizing posterior y trend and posterior predictions when temp is 58:
+```{r}
+ggplot(predict_58, aes(x = y_trend)) +geom_density()
+
+ggplot(predict_58, aes(x = y_new)) +geom_density()
+```
+
+### Practice Q1: part j (the stan way)
+
+let's use stan functions for posterior prediction!
+
+We'll make a prediction for 72 degrees!
+```{r}
+set.seed(84735)
+shortcut_prediction <- 
+  posterior_predict(normal_model_sim,
+                    newdata = data.frame(temp_actual = 72))
+```
+
+let's look at the denisty of posterior predictions
+```{r}
+mcmc_dens(shortcut_prediction) +
+labs(x = "predicted ridership on a 72 degree day")
+```
