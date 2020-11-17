@@ -2,28 +2,32 @@
 title: "Simple Normal Regression Analysis"
 author: "`r Sys.info()[['effective_user']]`"
 date: "`r Sys.time()`"
-output: html_document
+output: 
+  html_document:
+    code_folding: hide
 params:
-  dataset: !r tibble::tibble()
-  dependent_var: ""
-  independent_var: ""
+  data: !r tibble::tibble()
+  x: ""
+  y: ""
   n_chains: 4
   n_iter: 10000
   ci_pct: 95
+  n_lines: 200
   posterior_prob: !r c()
   posterior_predict: !r c()
   
 ---
 
 # Parameters
-1. Dataset: params$dataset
-2. Depedent Variable: params$dependent_var
-3. Independent Variable: params$independent_var
+1. Data: params$data
+2. Independent Variable: params$x
+3. Depedent Variable: params$y
 4. Number of stan chains: params$n_chains
 5. Number of chain iterations: params$n_iter
 6. Percentage to use in Credible Interval: params$ci_pct
-7. Vector of relationships to calculate the posterior probability for (e.g. dependent variable > 1.2)
-8. Vector of depdent variable values to predict indepdent variable values from (e.g. dependent variable = 5, what is potential model)
+7. Number of lines to include on the output with all the sample lines: params$n_liness
+8. Vector of relationships to calculate the posterior probability for (e.g. dependent variable > 1.2): params$posterior_prob
+9. Vector of depdent variable values to predict indepdent variable values from (e.g. dependent variable = 5, what is potential model): params$posterior_predict
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -37,8 +41,7 @@ library(janitor)
 
 ### Plot of variables of interest
 ```{r}
-data <- as.data.frame(params$dataset)
-ggplot(params$dataset, aes_string(x = params$independent_var, y = params$dependent_var)) + geom_point()
+ggplot(params$data, aes_string(x = params$x, y = params$y)) + geom_point()
 ```
 
 ### Building our model
@@ -48,11 +51,11 @@ set.seed(84735)
 
 ## Convert character parameters to a formula
 
-form <- as.formula(paste0(params$dependent_var, " ~ ", params$independent_var ))
+form <- as.formula(paste0(params$y, " ~ ", params$x))
 
 ## Pass that formula to normal_model_sim
 normal_model_sim <- stan_glm(form, 
-                              data = params$dataset,
+                              data = params$data,
                               family = gaussian,
                               chains = params$n_chains,
                               iter = params$n_iter)
@@ -96,7 +99,7 @@ posterior_interval(normal_model_sim, prob = frac)
 ```{r}
  # Shade in the 90% CI. For example:
  mcmc_areas(normal_model_sim,
-            pars = c(params$independent_var),
+            pars = c(params$x),
             prob = frac,
             point_est="mean")
 ```
@@ -193,3 +196,15 @@ let's look at the denisty of posterior predictions
 # mcmc_dens(shortcut_prediction) +
 # labs(x = "predicted ridership on a 72 degree day")
 ```
+
+
+
+
+
+# To-Do:
+
+1. Set up posterior probability/posterior prediction section. These should both be able to accept a vector of things to run. For probability, something of the form c(">8", "<=10", ">5") and for prediction, of the form c(82, 35, 90).
+2. Add a section from the Evaluating Regression Models lecture (Ch 10) for the posterior predictive check and potentially cross validation.
+3. Add in interpretations of output that are based on the output numbers in cases where they're possible.
+4. Make the output pretty!
+5. Write a function that runs this file!! Should require data, x, and y but everything else should be optional with good defaults.
