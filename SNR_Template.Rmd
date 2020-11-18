@@ -47,7 +47,8 @@ dataset <- read.csv(params$path_data)
 ```{r}
 
 ggplot(dataset, aes_string(x = params$x, y = params$y)) + 
-  geom_point()
+  geom_point() +
+  ggtitle(paste0(params$y, " vs. ", params$x))
 
 ```
 
