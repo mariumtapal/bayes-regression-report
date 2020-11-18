@@ -6,7 +6,7 @@ output:
   html_document:
     code_folding: hide
 params:
-  path_data: ""
+  data: !r tibble()
   x: ""
   y: ""
   n_chains: 4
@@ -19,7 +19,7 @@ params:
 ---
 
 # Parameters
-1. Path to dataset: params$path_data
+1. Data: params$data
 2. Independent Variable: params$x
 3. Depedent Variable: params$y
 4. Number of stan chains: params$n_chains
@@ -38,15 +38,13 @@ library(reshape2)
 library(janitor)
 library(bayesrules)
 
-dataset <- read.csv(params$path_data)
-
 ```
 
 
 ### Plot of variables of interest
 ```{r}
 
-ggplot(dataset, aes_string(x = params$x, y = params$y)) + 
+ggplot(params$data, aes_string(x = params$x, y = params$y)) + 
   geom_point() +
   ggtitle(paste0(params$y, " vs. ", params$x))
 
@@ -64,7 +62,7 @@ form <- as.formula(paste0(params$y, " ~ ", params$x))
 ## Pass that formula to normal_model_sim
 
 normal_model_sim <- stan_glm(form, 
-  data = dataset,
+  data = params$data,
   family = gaussian,
   chains = params$n_chains,
   iter = params$n_iter)
@@ -129,7 +127,7 @@ normal_model_df <- as.array(normal_model_sim) %>%
 
 
 if(params$n_lines == 0){
-  num_lines <- round(nrow(dataset)/4)
+  num_lines <- round(nrow(params$data)/4)
 }else{
   num_lines <- params$n_lines
 }
@@ -138,7 +136,7 @@ first_n <- head(normal_model_df, num_lines)
 intercept <- model_summary[1][1]
 slope <- model_summary[2][1]
 
-ggplot(dataset, aes_string(x = params$x, y = params$y)) +
+ggplot(params$data, aes_string(x = params$x, y = params$y)) +
   geom_point(size = 0.1) +
   geom_abline(
     data = first_n,
@@ -147,7 +145,7 @@ ggplot(dataset, aes_string(x = params$x, y = params$y)) +
       # issue here: have to access the x variable from the first_20 df not main df?
       slope = params$x
       ),
-    color = "orange", alpha = .8, size = 0.1
+    color = "cadetblue1", alpha = .8, size = 0.1
   )+
   geom_abline(aes(intercept = intercept, slope = slope),
     color = "blue"
@@ -157,7 +155,7 @@ ggplot(dataset, aes_string(x = params$x, y = params$y)) +
 
 
 
-```{r, eval = length(params$posterior_prob)>0}
+```{r, echo = length(params$posterior_prob)>0, eval = length(params$posterior_prob)>0}
 
 knitr::asis_output("### Posterior probability")
   
@@ -175,9 +173,11 @@ for(condition in params$posterior_prob){
 ```
 
 
-### Posterior predictions
 
-```{r, eval = length(params$posterior_predict)>0}
+
+```{r, echo = length(params$posterior_predict)>0, eval = length(params$posterior_predict)>0}
+knitr::asis_output("### Posterior predictions")
+
 set.seed(84735)
 
 for(prediction in params$posterior_predict){
@@ -202,8 +202,8 @@ for(prediction in params$posterior_predict){
 
 # To-Do:
 
-1. Set up posterior probability/posterior prediction section. These should both be able to accept a vector of things to run. For probability, something of the form c(">8", "<=10", ">5") and for prediction, of the form c(82, 35, 90).
-2. Add a section from the Evaluating Regression Models lecture (Ch 10) for the posterior predictive check and potentially cross validation.
-3. Add in interpretations of output that are based on the output numbers in cases where they're possible.
-4. Make the output pretty!
-5. Write a function that runs this file!! Should require data, x, and y but everything else should be optional with good defaults.
+1. Add a section from the Evaluating Regression Models lecture (Ch 10) for the posterior predictive check and potentially cross validation.
+2. Add in interpretations of output that are based on the output numbers in cases where they're possible.
+3. Make the output pretty!
+4. README + sample output HTMLs
+5. See if we can accept things like x = temp_feel instead of x = "temp_feel"
