@@ -154,37 +154,25 @@ ggplot(dataset, aes_string(x = params$x, y = params$y)) +
   )
 ```
 
-We can also do this with first 200
-
-```{r}
-first_200 <- head(normal_model_df, 200)
-
-# ggplot(params$data, aes(x = params$x, y = params$y)) +
-#   geom_point(size = 0.1) +
-#   geom_abline(
-#     data = first_200,
-#     aes(
-#       intercept = `(Intercept)`,
-#       slope = first_20[4]
-#     ),
-#     color = "orange", alpha = .8, size = 0.1
-#   ) +
-#   geom_abline(aes(intercept = intercept, slope = slope),
-#     color = "blue"
-#   )
-```
 
 
-### Practice Q1: part i
-Finding posterior probability that beta1>0
 
-```{r}
+```{r, eval = length(params$posterior_prob)>0}
 # conditions <- c(">8", "<=10", ">5")
 # a solution would  be to create a function for vectorizing
+knitr::asis_output("### Posterior probability")
+  
+for(condition in params$posterior_prob){
+  to_eval <- parse(text = paste0(params$x, condition))
+  
+  output <- normal_model_df %>%
+  mutate(fits_condition = eval(to_eval)) %>%
+  tabyl(fits_condition)
+  print(paste0("Probability that ", params$y, " ", condition, " = ", output$percent[2]))
+}
 
-normal_model_df %>%
-  mutate(exceeds_0 = params$x > 0) %>%
-  tabyl(exceeds_0)
+
+
 ```
 
 
