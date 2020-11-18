@@ -158,8 +158,7 @@ ggplot(dataset, aes_string(x = params$x, y = params$y)) +
 
 
 ```{r, eval = length(params$posterior_prob)>0}
-# conditions <- c(">8", "<=10", ">5")
-# a solution would  be to create a function for vectorizing
+
 knitr::asis_output("### Posterior probability")
   
 for(condition in params$posterior_prob){
@@ -176,41 +175,26 @@ for(condition in params$posterior_prob){
 ```
 
 
-### Practice Q1: part j (the non stan way)
+### Posterior predictions
 
-make posterior predictions for when the temp is 58 (vector here) degrees
-```{r}
-# set.seed(84735)
-# predict_z <- normal_model_df %>%
-#   mutate(y_trend = `(Intercept)` + params$x*58) %>%
-#   mutate(y_new = rnorm(20000, y_trend, sigma))
+```{r, eval = length(params$posterior_predict)>0}
+set.seed(84735)
+
+for(prediction in params$posterior_predict){
+  to_eval <- parse(text = paste0(params$x, " = ", prediction))
+  shortcut_prediction <- posterior_predict(
+  normal_model_sim,
+  newdata = data.frame(eval(to_eval)))
+
+  plot <- mcmc_dens(shortcut_prediction) +
+  labs(x = paste0("Predicted ", params$y, " when ", params$x, " = ", prediction))
+  
+  print(plot)
+}
+
 ```
 
 
-visualizing posterior y trend and posterior predictions when temp is 58:
-```{r}
-# ggplot(predict_58, aes(x = y_trend)) +geom_density()
-#
-# ggplot(predict_58, aes(x = y_new)) +geom_density()
-```
-
-### Practice Q1: part j (the stan way)
-
-let's use stan functions for posterior prediction!
-
-We'll make a prediction for 72 degrees!
-```{r}
-# set.seed(84735)
-# shortcut_prediction <-
-#   posterior_predict(normal_model_sim,
-#                     newdata = data.frame(temp_actual = 72))
-```
-
-let's look at the denisty of posterior predictions
-```{r}
-# mcmc_dens(shortcut_prediction) +
-# labs(x = "predicted ridership on a 72 degree day")
-```
 
 
 
