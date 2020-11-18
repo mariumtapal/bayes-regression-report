@@ -6,7 +6,7 @@ output:
   html_document:
     code_folding: hide
 params:
-  data: !r tibble::tibble()
+  path_data: ""
   x: ""
   y: ""
   n_chains: 4
@@ -19,7 +19,7 @@ params:
 ---
 
 # Parameters
-1. Data: params$data
+1. Path to dataset: params$path_data
 2. Independent Variable: params$x
 3. Depedent Variable: params$y
 4. Number of stan chains: params$n_chains
@@ -36,12 +36,14 @@ library(rstanarm)
 library(bayesplot)
 library(reshape2)
 library(janitor)
+
+dataset <- read.csv(params$path_data)
 ```
 
 
 ### Plot of variables of interest
 ```{r}
-ggplot(params$data, aes_string(x = params$x, y = params$y)) + geom_point()
+ggplot(dataset, aes_string(x = params$x, y = params$y)) + geom_point()
 ```
 
 ### Building our model
@@ -55,7 +57,7 @@ form <- as.formula(paste0(params$y, " ~ ", params$x))
 
 ## Pass that formula to normal_model_sim
 normal_model_sim <- stan_glm(form, 
-                              data = params$data,
+                              data = dataset,
                               family = gaussian,
                               chains = params$n_chains,
                               iter = params$n_iter)
