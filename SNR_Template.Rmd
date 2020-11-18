@@ -36,14 +36,19 @@ library(rstanarm)
 library(bayesplot)
 library(reshape2)
 library(janitor)
+library(bayesrules)
 
 dataset <- read.csv(params$path_data)
+
 ```
 
 
 ### Plot of variables of interest
 ```{r}
-ggplot(dataset, aes_string(x = params$x, y = params$y)) + geom_point()
+
+ggplot(dataset, aes_string(x = params$x, y = params$y)) + 
+  geom_point()
+
 ```
 
 ### Building our model
@@ -56,21 +61,22 @@ set.seed(84735)
 form <- as.formula(paste0(params$y, " ~ ", params$x))
 
 ## Pass that formula to normal_model_sim
+
 normal_model_sim <- stan_glm(form, 
-                              data = dataset,
-                              family = gaussian,
-                              chains = params$n_chains,
-                              iter = params$n_iter)
+  data = dataset,
+  family = gaussian,
+  chains = params$n_chains,
+  iter = params$n_iter)
 
 ```
 
 ### Diagnostics
 
 ```{r}
- 
+
 # Trace plots of parallel chains
 mcmc_trace(normal_model_sim, size = 0.1)
- 
+
 # Density plots of parallel chains
 mcmc_dens_overlay(normal_model_sim)
 ```
@@ -89,9 +95,9 @@ best guess for regression equation:
 ### Credible Interval
 
 ```{r}
-if(params$ci_pct > 1){
-  frac <- params$ci_pct/100
-}else{
+if (params$ci_pct > 1) {
+  frac <- params$ci_pct / 100
+} else {
   frac <- params$ci_pct
 }
 
@@ -99,11 +105,12 @@ posterior_interval(normal_model_sim, prob = frac)
 ```
 
 ```{r}
- # Shade in the 90% CI. For example:
- mcmc_areas(normal_model_sim,
-            pars = c(params$x),
-            prob = frac,
-            point_est="mean")
+# Shade in the 90% CI. For example:
+mcmc_areas(normal_model_sim,
+  pars = c(params$x),
+  prob = frac,
+  point_est = "mean"
+)
 ```
 
 ### Practice Q1: part g
@@ -111,10 +118,9 @@ posterior_interval(normal_model_sim, prob = frac)
 Creating a dataframe where the chains for each parameter are in one column
 
 ```{r}
-# 
-# normal_model_df <- as.array(normal_model_sim) %>%
-# melt %>%
-# pivot_wider(names_from = parameters, values_from = value)
+normal_model_df <- as.array(normal_model_sim) %>%
+  melt() %>%
+  pivot_wider(names_from = parameters, values_from = value)
 ```
 
 
@@ -122,33 +128,44 @@ Creating a dataframe where the chains for each parameter are in one column
 
 plotting the first 20 regression lines with the posterior mean regression line overlayed in blue
 ```{r}
-# first_20 <- head(normal_model_df, 20)
-# 
-# ggplot(params$dataset, aes(x = params$independent_var, y = params$dependent_var)) +
+first_20 <- head(normal_model_df, 20)
+intercept <- model_summary[1][1]
+slope <- model_summary[2][1]
+
+# ggplot(params$data, aes(x = params$x, y = params$y)) +
 #   geom_point(size = 0.1) +
-#   geom_abline(data = first_20,
-#               aes(intercept = `(Intercept)`, 
-#                   slope = params$independent_var),
-#               color = "orange",alpha=.8, size = 0.1) #+
-  # NEED TO MAKE SURE THESE NUMBERS BELOW ARE PULLED FROM THE MODEL
- # geom_abline(aes(intercept = -2173.12, slope = 89.31),
-  #            color = "blue")
+#   geom_abline(
+#     data = first_20,
+#     aes(
+#       intercept = `(Intercept)`,
+#       # issue here: have to access the x variable from the first_20 df not main df?
+#       slope = first_20[4]
+#       ),
+#     color = "orange", alpha = .8, size = 0.1
+#   )+
+#   geom_abline(aes(intercept = intercept, slope = slope),
+#     color = "blue"
+#   )
 ```
 
 We can also do this with first 200
 
 ```{r}
-# first_200 <- head(normal_model_df, 200)
-# 
-# ggplot(params$dataset, aes(x = params$independent_var, y = params$dependent_var)) +
+first_200 <- head(normal_model_df, 200)
+
+# ggplot(params$data, aes(x = params$x, y = params$y)) +
 #   geom_point(size = 0.1) +
-#   geom_abline(data = first_200,
-#               aes(intercept = `(Intercept)`, 
-#                   slope = params$independent_var),
-#               color = "orange",alpha=.8, size = 0.1) #+
-  # NEED TO MAKE SURE THESE NUMBERS BELOW ARE PULLED FROM THE MODEL
- # geom_abline(aes(intercept = -2173.12, slope = 89.31),
-  #            color = "blue")
+#   geom_abline(
+#     data = first_200,
+#     aes(
+#       intercept = `(Intercept)`,
+#       slope = first_20[4]
+#     ),
+#     color = "orange", alpha = .8, size = 0.1
+#   ) +
+#   geom_abline(aes(intercept = intercept, slope = slope),
+#     color = "blue"
+#   )
 ```
 
 
@@ -156,20 +173,22 @@ We can also do this with first 200
 Finding posterior probability that beta1>0
 
 ```{r}
-# 
-# normal_model_df %>%
-#   mutate(exceeds_0 = temp_actual > 0) %>%
-#   tabyl(exceeds_0)
+# conditions <- c(">8", "<=10", ">5")
+# a solution would  be to create a function for vectorizing
+
+normal_model_df %>%
+  mutate(exceeds_0 = params$x > 0) %>%
+  tabyl(exceeds_0)
 ```
 
 
 ### Practice Q1: part j (the non stan way)
 
-make posterior predictions for when the temp is 58 degrees
+make posterior predictions for when the temp is 58 (vector here) degrees
 ```{r}
 # set.seed(84735)
-# predict_58 <- normal_model_df %>%
-#   mutate(y_trend = `(Intercept)` + temp_actual*58) %>%
+# predict_z <- normal_model_df %>%
+#   mutate(y_trend = `(Intercept)` + params$x*58) %>%
 #   mutate(y_new = rnorm(20000, y_trend, sigma))
 ```
 
@@ -177,7 +196,7 @@ make posterior predictions for when the temp is 58 degrees
 visualizing posterior y trend and posterior predictions when temp is 58:
 ```{r}
 # ggplot(predict_58, aes(x = y_trend)) +geom_density()
-# 
+#
 # ggplot(predict_58, aes(x = y_new)) +geom_density()
 ```
 
@@ -188,7 +207,7 @@ let's use stan functions for posterior prediction!
 We'll make a prediction for 72 degrees!
 ```{r}
 # set.seed(84735)
-# shortcut_prediction <- 
+# shortcut_prediction <-
 #   posterior_predict(normal_model_sim,
 #                     newdata = data.frame(temp_actual = 72))
 ```
