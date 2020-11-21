@@ -155,6 +155,7 @@ normal_model_sim <- stan_glm(form,
 
 ```
 
+
 ### Diagnostics
 
 ```{r}
@@ -168,13 +169,87 @@ mcmc_dens_overlay(normal_model_sim)
 
 ### Posterior Summary Statistics
 
+Below are the summary statistics for the posterior of our simple normal regression model.
+
+The main columns to pay attention to are:
+
+1. mean
+2. n_eff
+3. Rhat
+
 ```{r}
 # Posterior summary statistics
 model_summary <- summary(normal_model_sim)
 head(as.data.frame(model_summary), -2)
 ```
 
-best guess for regression equation:
+```{r, echo = FALSE}
+df <- head(as.data.frame(model_summary), -2)
+intercept <- df[[1]][1]
+slope <- df[[1]][2]
+Rhats <- df[[8]]
+n_effs <- df[[7]]
+
+if(slope > 0){
+  slope <- paste0("+ ", as.character(slope))
+}else if(slope < 0) {
+  slope <- paste0("- ", as.character(abs(slope)))
+}else{
+  slope <- paste("+ ", as.character(slope))
+}
+
+```
+
+
+#### Best Guess For Regression Equation ('mean'):
+
+$$\hat{\text{`r params$y`}} = `r intercept` `r slope` * \text{`r params$x`}$$
+
+
+#### Number of Effective Iterations ('n_eff'):
+
+N_eff quantifies the number of independent samples it would take to produce an equivalently accurate posterior approximation as created by the Stan model.
+
+We should be suspicious of the quality of our model if N_eff is less than 10% of the number of iterations run by our model.
+
+```{r, echo = FALSE}
+n_effs_pretty <- df[7]
+
+n <- (params$n_iter * params$n_chains)
+
+n_effs_flag <- n_effs_pretty %>%
+  mutate(`Suspicious?` = n_eff/n < 0.1)
+
+row.names(n_effs_flag) <- c("(Intercept)", params$x, "sigma")
+
+n_effs_flag
+```
+
+
+
+#### Variability Across vs Within Chains ('Rhat'):
+
+Rhat measures the ratio between:
+
+1. The combined variability in our parameter across all chains, and
+2. The typical variability within any individual chain.
+
+Rhat values $\approx$ 1 indicate **stability** across chains, while Rhat values > 1 indicate **instability**.
+
+The Rhat values for the provided model are:
+
+```{r, echo = FALSE}
+Rhats_pretty <- df[8]
+Rhats <- df[[8]]
+
+Rhats_flagged <- Rhats_pretty %>% 
+  mutate(`Unstable?` = Rhat > 1.05)
+
+row.names(Rhats_flagged) <- c("(Intercept)", params$x, "sigma")
+
+Rhats_flagged
+```
+
 
 
 ### Credible Interval
