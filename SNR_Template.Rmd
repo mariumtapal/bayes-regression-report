@@ -19,16 +19,46 @@ params:
   
 ---
 
-# Parameters
-1. Data: params$data
-2. Independent Variable: params$x
-3. Depedent Variable: params$y
-4. Number of stan chains: params$n_chains
-5. Number of chain iterations: params$n_iter
-6. Percentage to use in Credible Interval: params$ci_pct
-7. Number of lines to include on the output with all the sample lines: params$n_liness
-8. Vector of relationships to calculate the posterior probability for (e.g. dependent variable > 1.2): params$posterior_prob
-9. Vector of depdent variable values to predict indepdent variable values from (e.g. dependent variable = 5, what is potential model): params$posterior_predict
+### Inputs
+
+#### Data: 
+
+```{r, echo = FALSE}
+str(params$data)
+```
+
+#### Independent Variable (X): `r params$x`
+
+#### Depedent Variable (Y): `r params$y`
+
+#### Number Of Stan Chains: `r params$n_chains`
+
+#### Number Of Iterations Per Chain: `r params$n_iter`
+
+#### Credible Interval Percentage: `r params$ci_pct`
+
+#### Number Of Potential Regression Lines To Graph: `r params$n_lines`
+
+
+```{r, eval = length(params$posterior_prob)> 0 , echo = FALSE}
+knitr::asis_output("#### Conditions To Check Posterior Probability Of (For Y Variable):")
+
+params$posterior_prob
+
+```
+
+
+
+```{r, eval = length(params$posterior_predict)> 0, echo = FALSE}
+knitr::asis_output("#### Values For X With Which To Predict Posterior Distributions Of Y: ")
+
+params$posterior_predict
+
+```
+
+#### Number Of Folds To Use With Cross-Validation: `r params$n_folds`
+
+`r params$n_folds`
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
