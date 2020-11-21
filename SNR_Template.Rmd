@@ -2,9 +2,7 @@
 title: "Simple Normal Regression Analysis"
 author: "`r Sys.info()[['effective_user']]`"
 date: "`r Sys.time()`"
-output: 
-  html_document:
-    code_folding: hide
+output: html_document
 params:
   data: !r tibble()
   x: ""
@@ -20,7 +18,7 @@ params:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 options(scipen = 100)
 library(tidyverse)
 library(rstanarm)
@@ -28,6 +26,7 @@ library(bayesplot)
 library(reshape2)
 library(janitor)
 library(bayesrules)
+library(kableExtra)
 
 
 if(params$n_lines == 0){
@@ -158,18 +157,36 @@ normal_model_sim <- stan_glm(form,
 
 ### Diagnostics
 
-```{r}
+#### Trace Plots
 
+```{r}
 # Trace plots of parallel chains
 mcmc_trace(normal_model_sim, size = 0.1)
+```
 
+#### Chain Density Overlay Plots
+
+```{r}
 # Density plots of parallel chains
 mcmc_dens_overlay(normal_model_sim)
 ```
 
+
+
 ### Posterior Summary Statistics
 
 Below are the summary statistics for the posterior of our simple normal regression model.
+
+
+```{r, echo = FALSE}
+# Posterior summary statistics
+model_summary <- summary(normal_model_sim)
+output <- head(as.data.frame(model_summary), -2)
+
+output %>%
+  kable(booktabs = T) %>%
+  kable_styling() 
+```
 
 The main columns to pay attention to are:
 
@@ -177,11 +194,8 @@ The main columns to pay attention to are:
 2. n_eff
 3. Rhat
 
-```{r}
-# Posterior summary statistics
-model_summary <- summary(normal_model_sim)
-head(as.data.frame(model_summary), -2)
-```
+Using these three columns, we can determine the *average* regression equation across all of our iterations (using 'mean') as well as get a sense of whether or not the chains produced an accurate estimate of the posterior (using 'n_eff' and 'Rhat').
+
 
 ```{r, echo = FALSE}
 df <- head(as.data.frame(model_summary), -2)
@@ -210,7 +224,9 @@ $$\hat{\text{`r params$y`}} = `r intercept` `r slope` * \text{`r params$x`}$$
 
 N_eff quantifies the number of independent samples it would take to produce an equivalently accurate posterior approximation as created by the Stan model.
 
-We should be suspicious of the quality of our model if N_eff is less than 10% of the number of iterations run by our model.
+We should be **suspicious** of the quality of our model if N_eff is less than 10% of the number of iterations run by our model across all of its chains.
+
+**In the table below, parameters for which suspicious values of n_eff were found are highlighted red. If NO rows are red, then your model is likely okay in terms of its number of effective iterations!**
 
 ```{r, echo = FALSE}
 n_effs_pretty <- df[7]
@@ -218,11 +234,18 @@ n_effs_pretty <- df[7]
 n <- (params$n_iter * params$n_chains)
 
 n_effs_flag <- n_effs_pretty %>%
+  mutate(n_iterations = n) %>%
+  mutate(ratio = n_eff / n_iterations) %>%
   mutate(`Suspicious?` = n_eff/n < 0.1)
 
 row.names(n_effs_flag) <- c("(Intercept)", params$x, "sigma")
 
-n_effs_flag
+color.me <- which(n_effs_flag$`Suspicious?` == TRUE)
+
+n_effs_flag %>%
+  kable(booktabs = T) %>%
+  kable_styling() %>%
+  row_spec(color.me, bold = T, color = "red")
 ```
 
 
@@ -236,7 +259,9 @@ Rhat measures the ratio between:
 
 Rhat values $\approx$ 1 indicate **stability** across chains, while Rhat values > 1 indicate **instability**.
 
-The Rhat values for the provided model are:
+
+**In the table below, parameters for which suspicious values of Rhat were found are highlighted red. If NO rows are red, then your model is likely okay in terms its chain variability ratio!**
+
 
 ```{r, echo = FALSE}
 Rhats_pretty <- df[8]
@@ -247,7 +272,13 @@ Rhats_flagged <- Rhats_pretty %>%
 
 row.names(Rhats_flagged) <- c("(Intercept)", params$x, "sigma")
 
-Rhats_flagged
+color.me <- which(Rhats_flagged$`Unstable?` == TRUE)
+
+Rhats_flagged %>% 
+  kable(booktabs = T) %>%
+  kable_styling() %>%
+  row_spec(color.me, bold = T, color = "red")
+
 ```
 
 
@@ -262,7 +293,9 @@ if (params$ci_pct > 1) {
   frac <- params$ci_pct
 }
 
-posterior_interval(normal_model_sim, prob = frac)
+posterior_interval(normal_model_sim, prob = frac) %>%
+  kable(booktabs = T) %>%
+  kable_styling() 
 ```
 
 ```{r, fig.show = 'hold', out.width = "30%"}
@@ -290,18 +323,15 @@ mcmc_areas(normal_model_sim,
 
 ```
 
-### Restructuring the dataframe
+
+### Plot of Potential Regression Lines Determined By Model
 
 ```{r}
+
+# Restructuring the data frame
 normal_model_df <- as.array(normal_model_sim) %>%
   melt() %>%
   pivot_wider(names_from = parameters, values_from = value)
-```
-
-
-### Plotting potential regression lines from model
-
-```{r}
 
 
 if(params$n_lines == 0){
@@ -409,7 +439,9 @@ cv_procedure <- prediction_summary_cv(data = params$data,
                                       model = normal_model_sim,
                                       k = params$n_folds)
 
-cv_procedure$cv
+cv_procedure$cv %>%
+  kable(booktabs = T) %>%
+  kable_styling() 
 ```
 
 
