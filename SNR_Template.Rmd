@@ -251,8 +251,9 @@ Rhats_flagged
 ```
 
 
-
 ### Credible Interval
+
+Below we see `r params$ci_pct`% Credible Intervals for the posterior distribution of our three parameters: the intercept, slope, and the standard deviation of our data around the proposed regression line.
 
 ```{r}
 if (params$ci_pct > 1) {
@@ -264,13 +265,29 @@ if (params$ci_pct > 1) {
 posterior_interval(normal_model_sim, prob = frac)
 ```
 
-```{r}
-# Shade in the 90% CI. For example:
+```{r, fig.show = 'hold', out.width = "30%"}
+# Shade in the CI. For example:
+
+mcmc_areas(normal_model_sim,
+  pars = "(Intercept)",
+  prob = frac,
+  point_est = "mean"
+) + labs(title = "(Intercept)")
+
 mcmc_areas(normal_model_sim,
   pars = c(params$x),
   prob = frac,
   point_est = "mean"
-)
+) + labs(title = params$x)
+
+mcmc_areas(normal_model_sim,
+  pars = "sigma",
+  prob = frac,
+  point_est = "mean"
+) + labs(title = "sigma")
+
+
+
 ```
 
 ### Restructuring the dataframe
