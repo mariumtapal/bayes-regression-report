@@ -19,6 +19,25 @@ params:
   
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(scipen = 100)
+library(tidyverse)
+library(rstanarm)
+library(bayesplot)
+library(reshape2)
+library(janitor)
+library(bayesrules)
+
+
+if(params$n_lines == 0){
+  num_lines_display <- round(nrow(params$data)/4)
+}else{
+  num_lines_display <- params$n_lines
+}
+```
+
+
 ### Inputs
 
 #### Data: 
@@ -37,7 +56,7 @@ str(params$data)
 
 #### Credible Interval Percentage: `r params$ci_pct`
 
-#### Number Of Potential Regression Lines To Graph: `r params$n_lines`
+#### Number Of Potential Regression Lines To Graph: `r num_lines_display`
 
 
 ```{r, eval = length(params$posterior_prob)> 0 , echo = FALSE}
@@ -58,18 +77,6 @@ params$posterior_predict
 
 #### Number Of Folds To Use With Cross-Validation: `r params$n_folds`
 
-`r params$n_folds`
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)
-library(rstanarm)
-library(bayesplot)
-library(reshape2)
-library(janitor)
-library(bayesrules)
-
-```
 
 ```{r, echo = FALSE}
 # Define CV function
@@ -131,7 +138,7 @@ ggplot(params$data, aes_string(x = params$x, y = params$y)) +
 
 ### Building our model
 
-```{r message=FALSE, results="hide"}
+```{r message=FALSE, results="hide", class.source = "fold-show"}
 set.seed(84735)
 
 ## Convert character parameters to a formula
