@@ -8,7 +8,8 @@ snr <- function(data,
                 ci_pct = 95,
                 n_lines = 0,
                 posterior_prob = c(),
-                posterior_predict = c()){
+                posterior_predict = c(),
+                n_folds = 10){
   
   rmarkdown::render("SNR_Template.Rmd", params = list(
     data = data,
@@ -18,6 +19,7 @@ snr <- function(data,
     n_iter = n_iter,
     n_lines = n_lines,
     posterior_prob = posterior_prob,
-    posterior_predict = posterior_predict
+    posterior_predict = posterior_predict,
+    n_folds = n_folds
   ))
 }

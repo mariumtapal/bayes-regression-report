@@ -15,6 +15,7 @@ params:
   n_lines: 0
   posterior_prob: !r c()
   posterior_predict: !r c()
+  n_folds: 10
   
 ---
 
@@ -40,12 +41,60 @@ library(bayesrules)
 
 ```
 
+```{r, echo = FALSE}
+# Define CV function
+
+prediction_summary_cv <- function(data, model, k = 10, prob_inner = 0.5, prob_outer = 0.95){
+  
+      # Split data into k possibly unequal folds
+      # https://gist.github.com/dsparks/3695362
+      random_draw <- rnorm(nrow(data))
+      k_quantiles <- quantile(random_draw, 0:k/k)
+      folds <- cut(random_draw, k_quantiles, include.lowest = TRUE)
+      levels(folds) <- 1:k
+      data <- data %>% 
+                mutate(fold = sample(folds, size = length(folds), replace = FALSE))
+      y <- model$terms[[2]]
+          
+      # Test the model on each one of the k folds
+      folds <- data.frame()
+      for(i in 1:k){
+        
+         data_train <- data %>% 
+           filter(fold != i) %>% 
+           dplyr::select(-fold)
+         
+        data_test <- data %>% 
+           filter(fold == i) %>% 
+           dplyr::select(-fold)
+        
+        model_train <- update(model, data = data_train, refresh = FALSE)
+        
+        predictions_test <- posterior_predict(model_train, newdata = data_test)
+        
+        folds <- rbind(folds,
+                       prediction_summary(y = c(as.matrix((data_test %>% select(y))[,1])),
+                                          yrep = predictions_test))
+        }
+          
+      # Calculate the cross validated error
+      cv <- folds %>% 
+        summarize_all(mean)
+      
+      folds <- data.frame(fold = 1:k, folds)
+      
+      
+      return(list(folds = folds, cv = cv))
+}
+
+```
+
 
 ### Plot of variables of interest
 ```{r}
 
 ggplot(params$data, aes_string(x = params$x, y = params$y)) + 
-  geom_point() +
+  geom_point(color = "#00134A") +
   ggtitle(paste0(params$y, " vs. ", params$x))
 
 ```
@@ -145,10 +194,10 @@ ggplot(params$data, aes_string(x = params$x, y = params$y)) +
       # issue here: have to access the x variable from the first_20 df not main df?
       slope = params$x
       ),
-    color = "cadetblue1", alpha = .8, size = 0.1
+    color = "#CADDEC", alpha = .8, size = 0.1
   )+
   geom_abline(aes(intercept = intercept, slope = slope),
-    color = "blue"
+    color = "#00134A"
   )
 ```
 
@@ -196,14 +245,48 @@ for(prediction in params$posterior_predict){
 
 
 
+### Evaluating Prediction Quality
 
 
+#### Posterior Predictive Check
+
+```{r}
+set.seed(84735)
+pp_check(normal_model_sim, nreps = 50)
+```
+
+#### Posterior Prediction Intervals
+
+```{r}
+set.seed(84735)
+
+predictions <- posterior_predict(normal_model_sim,
+  newdata = data)
+
+dataset <- params$data
+
+to_eval <- paste0("ppc_intervals(dataset$", params$y, ", yrep = predictions, x = ", "dataset$", params$x, ", prob = 0.5, prob_outer = 0.95)")
+
+eval(parse(text = to_eval))
+```
+
+
+#### Cross Validation
+
+```{r, message = FALSE}
+set.seed(84735)
+
+cv_procedure <- prediction_summary_cv(data = params$data,
+                                      model = normal_model_sim,
+                                      k = params$n_folds)
+
+cv_procedure$cv
+```
 
 
 # To-Do:
 
-1. Add a section from the Evaluating Regression Models lecture (Ch 10) for the posterior predictive check and potentially cross validation.
-2. Add in interpretations of output that are based on the output numbers in cases where they're possible.
-3. Make the output pretty!
-4. README + sample output HTMLs
-5. See if we can accept things like x = temp_feel instead of x = "temp_feel"
+1. Add in interpretations of output that are based on the output numbers in cases where they're possible. (And also add in text that describes what each graph is showing!)
+2. Make the output pretty!
+3. README + sample output HTMLs
+4. See if we can accept things like x = temp_feel instead of x = "temp_feel"
