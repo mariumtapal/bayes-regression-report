@@ -18,7 +18,7 @@ params:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, fig.width = 9, fig.height = 4)
 options(scipen = 100)
 library(tidyverse)
 library(rstanarm)
@@ -37,7 +37,7 @@ if(params$n_lines == 0){
 ```
 
 
-### Inputs
+## Analysis Inputs
 
 #### Data: 
 
@@ -45,17 +45,17 @@ if(params$n_lines == 0){
 str(params$data)
 ```
 
-#### Independent Variable (X): `r params$x`
+#### Independent Variable (X): <span style="color:gray">`r params$x`</span>
 
-#### Depedent Variable (Y): `r params$y`
+#### Depedent Variable (Y): <span style="color:gray">`r params$y`</span>
 
-#### Number Of Stan Chains: `r params$n_chains`
+#### Number Of Stan Chains: <span style="color:gray">`r params$n_chains`</span>
 
-#### Number Of Iterations Per Chain: `r params$n_iter`
+#### Number Of Iterations Per Chain: <span style="color:gray">`r params$n_iter`</span>
 
-#### Credible Interval Percentage: `r params$ci_pct`
+#### Credible Interval Percentage: <span style="color:gray">`r params$ci_pct`</span>
 
-#### Number Of Potential Regression Lines To Graph: `r num_lines_display`
+#### Number Of Potential Regression Lines To Graph: <span style="color:gray">`r num_lines_display`</span>
 
 
 ```{r, eval = length(params$posterior_prob)> 0 , echo = FALSE}
@@ -74,7 +74,7 @@ params$posterior_predict
 
 ```
 
-#### Number Of Folds To Use With Cross-Validation: `r params$n_folds`
+#### Number Of Folds To Use With Cross-Validation: <span style="color:gray">`r params$n_folds`</span>
 
 
 ```{r, echo = FALSE}
@@ -126,7 +126,14 @@ prediction_summary_cv <- function(data, model, k = 10, prob_inner = 0.5, prob_ou
 ```
 
 
-### Plot of variables of interest
+## Plot Of X & Y
+
+
+
+Below, we see a scatterplot of our X & Y variables of interest, `r params$x` and `r params$y`:
+
+
+
 ```{r}
 
 ggplot(params$data, aes_string(x = params$x, y = params$y)) + 
@@ -135,9 +142,15 @@ ggplot(params$data, aes_string(x = params$x, y = params$y)) +
 
 ```
 
-### Building our model
+## Defining The Stan Model
 
-```{r message=FALSE, results="hide", class.source = "fold-show"}
+
+
+We then use the `Stan` package to build a Bayesian Simple Normal Regression Model based on the provided inputs:
+
+
+
+```{r message=FALSE, results="hide", class.source = "fold-show", echo = TRUE}
 set.seed(84735)
 
 ## Convert character parameters to a formula
@@ -155,16 +168,55 @@ normal_model_sim <- stan_glm(form,
 ```
 
 
-### Diagnostics
+## Visual Diagnostics
+
+
+
+To evaluate the quality of the model, we consider several visual diagnostics: trace plots and chain density overlay plots.
+
+
 
 #### Trace Plots
+
+
+
+Trace plots show us the patterns of our chain values across all of their iterations. Based on the appearance of those plots, we can determine whether the model was an effective simulation or not.
+
+What you **want** to see:
+
+* A bunch of white noise
+
+What you **DO NOT want** to see:
+
+* A clear non-zero slope in the movement of the chains across all iterations. For example, as iterations increase, you can see that the chain values consistently increase/decrease. 
+
+* Sections where the chain appears to get stuck. These will be visible as breaks in the plot where there is only a horizontal line rather than vertical white noise.
+
+**If the trace plots are of low quality, INCREASE the number of iterations for your Stan model.**
 
 ```{r}
 # Trace plots of parallel chains
 mcmc_trace(normal_model_sim, size = 0.1)
 ```
 
+
+
 #### Chain Density Overlay Plots
+
+
+
+Chain density overlay plots also help determine whether the simulation was accurate. These show overlaid density plots of the posterior distributions found all of our parameters in each chain.
+
+What you **want** to see:
+
+* For each parameter (intercept, slope, sigma), the density plots should look almost identical. 
+* It is okay if there are slight deviations in density as long as the peaks of the density plots are very similar, as are their ranges and shapes.
+
+What you **DO NOT want** to see:
+
+* Chains with different distributions (different peaks, ranges, and/or shapes)
+
+**If the density overlay plots are of low quality, INCREASE the number of iterations for your Stan model.**
 
 ```{r}
 # Density plots of parallel chains
@@ -173,9 +225,14 @@ mcmc_dens_overlay(normal_model_sim)
 
 
 
-### Posterior Summary Statistics
 
-Below are the summary statistics for the posterior of our simple normal regression model.
+## Posterior Summary Statistics and Mathematical Diagnostics
+
+
+
+Below are the summary statistics for the posterior of our simple normal regression model:
+
+
 
 
 ```{r, echo = FALSE}
@@ -195,6 +252,7 @@ The main columns to pay attention to are:
 3. Rhat
 
 Using these three columns, we can determine the *average* regression equation across all of our iterations (using 'mean') as well as get a sense of whether or not the chains produced an accurate estimate of the posterior (using 'n_eff' and 'Rhat').
+
 
 
 ```{r, echo = FALSE}
@@ -217,10 +275,14 @@ if(slope > 0){
 
 #### Best Guess For Regression Equation ('mean'):
 
+
+
 $$\hat{\text{`r params$y`}} = `r intercept` `r slope` * \text{`r params$x`}$$
 
 
 #### Number of Effective Iterations ('n_eff'):
+
+
 
 N_eff quantifies the number of independent samples it would take to produce an equivalently accurate posterior approximation as created by the Stan model.
 
@@ -252,6 +314,8 @@ n_effs_flag %>%
 
 #### Variability Across vs Within Chains ('Rhat'):
 
+
+
 Rhat measures the ratio between:
 
 1. The combined variability in our parameter across all chains, and
@@ -282,7 +346,10 @@ Rhats_flagged %>%
 ```
 
 
-### Credible Interval
+
+## Credible Intervals
+
+
 
 Below we see `r params$ci_pct`% Credible Intervals for the posterior distribution of our three parameters: the intercept, slope, and the standard deviation of our data around the proposed regression line.
 
@@ -297,6 +364,8 @@ posterior_interval(normal_model_sim, prob = frac) %>%
   kable(booktabs = T) %>%
   kable_styling() 
 ```
+
+
 
 ```{r, fig.show = 'hold', out.width = "30%"}
 # Shade in the CI. For example:
@@ -324,7 +393,10 @@ mcmc_areas(normal_model_sim,
 ```
 
 
-### Plot of Potential Regression Lines Determined By Model
+
+## Plot of Potential Regression Lines Determined By Model
+
+
 
 ```{r}
 
@@ -365,7 +437,7 @@ ggplot(params$data, aes_string(x = params$x, y = params$y)) +
 
 ```{r, echo = length(params$posterior_prob)>0, eval = length(params$posterior_prob)>0}
 
-knitr::asis_output("### Posterior probability")
+knitr::asis_output("## Posterior Probability Calculations")
   
 for(condition in params$posterior_prob){
   to_eval <- parse(text = paste0(params$x, condition))
@@ -376,15 +448,13 @@ for(condition in params$posterior_prob){
   print(paste0("Probability that ", params$y, " ", condition, " = ", output$percent[2]))
 }
 
-
-
 ```
 
 
 
 
 ```{r, echo = length(params$posterior_predict)>0, eval = length(params$posterior_predict)>0}
-knitr::asis_output("### Posterior predictions")
+knitr::asis_output("## Posterior Predictions")
 
 set.seed(84735)
 
@@ -403,18 +473,24 @@ for(prediction in params$posterior_predict){
 ```
 
 
+## Evaluating Prediction Quality
 
-### Evaluating Prediction Quality
 
 
 #### Posterior Predictive Check
+
+
 
 ```{r}
 set.seed(84735)
 pp_check(normal_model_sim, nreps = 50)
 ```
 
+
+
 #### Posterior Prediction Intervals
+
+
 
 ```{r}
 set.seed(84735)
@@ -430,7 +506,10 @@ eval(parse(text = to_eval))
 ```
 
 
+
 #### Cross Validation
+
+
 
 ```{r, message = FALSE}
 set.seed(84735)
@@ -443,6 +522,7 @@ cv_procedure$cv %>%
   kable(booktabs = T) %>%
   kable_styling() 
 ```
+
 
 
 # To-Do:
