@@ -1,0 +1,18 @@
+---
+title: "SDS 390 Final Project: Simple Normal Regression Analysis"
+author: "Audrey Bertin & Marium Tapal"
+date: "Dec 17 2020"
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# bayes-regression-report
+
