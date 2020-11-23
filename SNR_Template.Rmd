@@ -374,19 +374,22 @@ mcmc_areas(normal_model_sim,
   pars = "(Intercept)",
   prob = frac,
   point_est = "mean"
-) + labs(title = "(Intercept)")
+) + labs(title = "(Intercept)") + 
+  theme(text = element_text(size = 30)) 
 
 mcmc_areas(normal_model_sim,
   pars = c(params$x),
   prob = frac,
   point_est = "mean"
-) + labs(title = params$x)
+) + labs(title = params$x) +
+  theme(text = element_text(size = 30)) 
 
 mcmc_areas(normal_model_sim,
   pars = "sigma",
   prob = frac,
   point_est = "mean"
-) + labs(title = "sigma")
+) + labs(title = "sigma") + 
+  theme(text = element_text(size = 30)) 
 
 
 
