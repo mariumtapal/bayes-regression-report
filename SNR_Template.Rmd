@@ -534,3 +534,4 @@ cv_procedure$cv %>%
 2. Make the output pretty!
 3. README + sample output HTMLs
 4. See if we can accept things like x = temp_feel instead of x = "temp_feel"
+5. (Idea). In the function we can add a `output_file` arg to `render()` and based on the input dataset/variables the output file will be named. For eg, knitted file would be named `SNR-bikes-temp_actual-rides.html` just for a meaningful file name
