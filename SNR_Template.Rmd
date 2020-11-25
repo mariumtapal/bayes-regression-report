@@ -573,3 +573,4 @@ High quality models have the following characteristics:
 2. Make the output pretty!
 3. README + sample output HTMLs
 4. See if we can accept things like x = temp_feel instead of x = "temp_feel"
+5. Add in a method of displaying (in the html output) the function that was used to generate the file!
