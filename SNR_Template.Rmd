@@ -4,7 +4,7 @@ author: "`r Sys.info()[['effective_user']]`"
 date: "`r Sys.time()`"
 output: html_document
 params:
-  data: !r tibble()
+  data: !r dplyr::tibble()
   x: ""
   y: ""
   n_chains: 4
