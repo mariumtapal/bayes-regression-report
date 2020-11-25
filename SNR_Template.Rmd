@@ -2,7 +2,9 @@
 title: "Simple Normal Regression Analysis"
 author: "`r Sys.info()[['effective_user']]`"
 date: "`r Sys.time()`"
-output: html_document
+output: 
+  html_document:
+    theme: paper
 params:
   data: !r dplyr::tibble()
   x: ""
@@ -257,8 +259,8 @@ Using these three columns, we can determine the *average* regression equation ac
 
 ```{r, echo = FALSE}
 df <- head(as.data.frame(model_summary), -2)
-intercept <- df[[1]][1]
-slope <- df[[1]][2]
+intercept <- round(df[[1]][1], 2)
+slope <- round(df[[1]][2], 2)
 Rhats <- df[[8]]
 n_effs <- df[[7]]
 
@@ -360,7 +362,9 @@ if (params$ci_pct > 1) {
   frac <- params$ci_pct
 }
 
-posterior_interval(normal_model_sim, prob = frac) %>%
+credible_intervals <- posterior_interval(normal_model_sim, prob = frac) 
+
+credible_intervals %>%
   kable(booktabs = T) %>%
   kable_styling() 
 ```
@@ -395,14 +399,16 @@ mcmc_areas(normal_model_sim,
 
 ```
 
+There is a `r params$ci_pct`% posterior probability that the:
+
+- **intercept** of the model is between `r round(credible_intervals[[1]], 2)` and `r round(credible_intervals[[4]], 2)`.
+- **slope** (`r params$x`) of the model is between `r round(credible_intervals[[2]], 2)` and `r round(credible_intervals[[5]], 2)`.
+- **sigma** (standard deviation) of the model is between `r round(credible_intervals[[3]], 2)` and `r round(credible_intervals[[6]], 2)`.
 
 
 ## Plot of Potential Regression Lines Determined By Model
 
-
-
 ```{r}
-
 # Restructuring the data frame
 normal_model_df <- as.array(normal_model_sim) %>%
   melt() %>%
@@ -418,6 +424,12 @@ if(params$n_lines == 0){
 first_n <- head(normal_model_df, num_lines)
 intercept <- model_summary[1][1]
 slope <- model_summary[2][1]
+```
+
+Below is a plot of the first `r num_lines` potential regression lines proposed by the model (plotted in light blue) alongside the mean proposed regression line (plotted in dark blue):
+
+```{r}
+
 
 ggplot(params$data, aes_string(x = params$x, y = params$y)) +
   geom_point(size = 0.1) +
@@ -434,7 +446,6 @@ ggplot(params$data, aes_string(x = params$x, y = params$y)) +
     color = "#00134A"
   )
 ```
-
 
 
 
@@ -482,6 +493,13 @@ for(prediction in params$posterior_predict){
 
 #### Posterior Predictive Check
 
+The posterior predictive check compares the distribution of our data (dark blue) with the distribution of our predictions (light blue).
+
+We have a high quality model if the following features our distributions are similar:
+
+* Range
+* Mode 
+* Shape
 
 
 ```{r}
@@ -493,7 +511,12 @@ pp_check(normal_model_sim, nreps = 50)
 
 #### Posterior Prediction Intervals
 
+The graph below provides a quick visual summary of how consistent the observed outcomes/data (dark blue dots) are with the range of predictions made by posterior model (light blue lines). 
 
+The model is of high quality if:
+
+* The vast majority of dark blue dots fall within the light blue bars, AND
+* Within the light blue region, the dots cluster more toward the middle than toward the outside.
 
 ```{r}
 set.seed(84735)
@@ -512,7 +535,9 @@ eval(parse(text = to_eval))
 
 #### Cross Validation
 
+Finally, we can use cross-validation to get a sense of how well our model will work when given entirely new data!
 
+Below, we see summaries of model quality for a cross-validation model with `r n_folds` folds:
 
 ```{r, message = FALSE}
 set.seed(84735)
@@ -526,11 +551,24 @@ cv_procedure$cv %>%
   kable_styling() 
 ```
 
+* The `mae` (median absolute error) value means that the typical difference between the observed data points and their posterior predictive medians is `r cv_procedure$cv[[1]]`.
+
+* The `mae_scaled` (scaled median absolute error) value means that the typical number of absolute deviations between the observed data points and their posterior predictive medians is `r cv_procedure$cv[[2]]`
+
+* The `within_50` and `within_95` statistics measure the proportion of observed values that fall within the 50% and 95% posterior prediction intervals, respectivelyl. For this model, those values are `r cv_procedure$cv[[3]]` (50%) and `r cv_procedure$cv[[4]]` (95%).
+
+
+High quality models have the following characteristics:
+
+* `mae` values are dependent on the scale of the data. They should be as small as possible.
+* `mae_scaled` should be relatively close to 1 (and definitely less than 2).
+* `within_50` should be around 0.5 (higher values are better).
+* `within_95` should be around 0.95 (higher values are better).
 
 
 # To-Do:
 
-1. Add in interpretations of output that are based on the output numbers in cases where they're possible. (And also add in text that describes what each graph is showing!)
+1. Add in interpretations of output that are based on the output numbers in cases where they're possible. (And also add in text that describes what each graph is showing!) -- need to do interpretations for posterior probabilities / predictions.
 2. Make the output pretty!
 3. README + sample output HTMLs
 4. See if we can accept things like x = temp_feel instead of x = "temp_feel"
