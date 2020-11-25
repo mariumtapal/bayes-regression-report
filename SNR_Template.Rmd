@@ -30,9 +30,11 @@ library(janitor)
 library(bayesrules)
 library(kableExtra)
 
+dataset <- na.omit(params$data)
+
 
 if(params$n_lines == 0){
-  num_lines_display <- round(nrow(params$data)/4)
+  num_lines_display <- round(nrow(dataset)/4)
 }else{
   num_lines_display <- params$n_lines
 }
@@ -44,7 +46,7 @@ if(params$n_lines == 0){
 #### Data: 
 
 ```{r, echo = FALSE}
-str(params$data)
+str(dataset)
 ```
 
 #### Independent Variable (X): <span style="color:gray">`r params$x`</span>
@@ -138,7 +140,7 @@ Below, we see a scatterplot of our X & Y variables of interest, `r params$x` and
 
 ```{r}
 
-ggplot(params$data, aes_string(x = params$x, y = params$y)) + 
+ggplot(dataset, aes_string(x = params$x, y = params$y)) + 
   geom_point(color = "#00134A") +
   ggtitle(paste0(params$y, " vs. ", params$x))
 
@@ -162,7 +164,7 @@ form <- as.formula(paste0(params$y, " ~ ", params$x))
 ## Pass that formula to normal_model_sim
 
 normal_model_sim <- stan_glm(form, 
-  data = params$data,
+  data = dataset,
   family = gaussian,
   chains = params$n_chains,
   iter = params$n_iter)
@@ -416,7 +418,7 @@ normal_model_df <- as.array(normal_model_sim) %>%
 
 
 if(params$n_lines == 0){
-  num_lines <- round(nrow(params$data)/4)
+  num_lines <- round(nrow(dataset)/4)
 }else{
   num_lines <- params$n_lines
 }
@@ -431,7 +433,7 @@ Below is a plot of the first `r num_lines` potential regression lines proposed b
 ```{r}
 
 
-ggplot(params$data, aes_string(x = params$x, y = params$y)) +
+ggplot(dataset, aes_string(x = params$x, y = params$y)) +
   geom_point(size = 0.1) +
   geom_abline(
     data = first_n,
@@ -522,9 +524,8 @@ The model is of high quality if:
 set.seed(84735)
 
 predictions <- posterior_predict(normal_model_sim,
-  newdata = data)
+  newdata = dataset)
 
-dataset <- params$data
 
 to_eval <- paste0("ppc_intervals(dataset$", params$y, ", yrep = predictions, x = ", "dataset$", params$x, ", prob = 0.5, prob_outer = 0.95)")
 
@@ -542,7 +543,7 @@ Below, we see summaries of model quality for a cross-validation model with `r n_
 ```{r, message = FALSE}
 set.seed(84735)
 
-cv_procedure <- prediction_summary_cv(data = params$data,
+cv_procedure <- prediction_summary_cv(data = dataset,
                                       model = normal_model_sim,
                                       k = params$n_folds)
 
@@ -572,4 +573,3 @@ High quality models have the following characteristics:
 2. Make the output pretty!
 3. README + sample output HTMLs
 4. See if we can accept things like x = temp_feel instead of x = "temp_feel"
-5. (Idea). In the function we can add a `output_file` arg to `render()` and based on the input dataset/variables the output file will be named. For eg, knitted file would be named `SNR-bikes-temp_actual-rides.html` just for a meaningful file name

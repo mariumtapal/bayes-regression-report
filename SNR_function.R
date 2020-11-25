@@ -21,5 +21,6 @@ snr <- function(data,
     posterior_prob = posterior_prob,
     posterior_predict = posterior_predict,
     n_folds = n_folds
-  ))
+  ),
+  output_file = paste0("SNR_Results_", deparse(substitute(data)), "_", x, "_", y, ".html"))
 }
