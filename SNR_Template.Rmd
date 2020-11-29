@@ -428,7 +428,7 @@ intercept <- model_summary[1][1]
 slope <- model_summary[2][1]
 ```
 
-Below is a plot of the first `r num_lines` potential regression lines proposed by the model (plotted in light blue) alongside the mean proposed regression line (plotted in dark blue):
+Below is a plot of the first `r num_lines` potential regression lines proposed by the model (plotted in medium blue) alongside the mean proposed regression line (plotted in dark blue):
 
 ```{r}
 
@@ -442,7 +442,7 @@ ggplot(dataset, aes_string(x = params$x, y = params$y)) +
       # issue here: have to access the x variable from the first_20 df not main df?
       slope = params$x
       ),
-    color = "#CADDEC", alpha = .8, size = 0.1
+    color = "#5693C2", alpha = .8, size = 0.1
   )+
   geom_abline(aes(intercept = intercept, slope = slope),
     color = "#00134A"
@@ -466,7 +466,7 @@ posterior_probability <- normal_model_df %>%
 
 ```
 
-The slope found by the model was `r slope_direction`. The probability of getting a slope `r slope_condition` is `r ifelse(is.na(posterior_probability[[3]][2]) , posterior_probability[[3]], posterior_probability[[3]][2])`.
+The slope found by the model was **`r slope_direction`**. The probability of getting a slope `r slope_condition` is `r ifelse(is.na(posterior_probability[[3]][2]) , posterior_probability[[3]], posterior_probability[[3]][2])`.
 
 ```{r}
 posterior_probability %>%
@@ -592,5 +592,4 @@ High quality models have the following characteristics:
 
 1. README + sample output HTMLs
 2. See if we can accept things like x = temp_feel instead of x = "temp_feel" (highly optional)
-3. Think about removing/changing posterior probability section because it doesn't make much sense right now.
-4. For posterior predictions, consider adding in some visuals to help differentiate between graphs.
+3. For posterior predictions, consider adding in some visuals to help differentiate between graphs.
