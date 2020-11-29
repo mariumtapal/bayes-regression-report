@@ -13,9 +13,9 @@ params:
   n_iter: 10000
   ci_pct: 95
   n_lines: 0
-  posterior_prob: !r c()
   posterior_predict: !r c()
   n_folds: 10
+  func: ""
   
 ---
 
@@ -449,28 +449,47 @@ ggplot(dataset, aes_string(x = params$x, y = params$y)) +
   )
 ```
 
+## Posterior Probability of Calculated Slope
 
+```{r}
+slope_direction <- ifelse(df[[1]][2] > 0, "positive", "negative")
+slope_condition <- ifelse(slope_direction == "positive", " > 0", " < 0")
+```
 
-```{r, echo = length(params$posterior_prob)>0, eval = length(params$posterior_prob)>0}
+```{r}
 
-knitr::asis_output("## Posterior Probability Calculations")
+to_eval <- parse(text = paste0(params$x, slope_condition))
   
-for(condition in params$posterior_prob){
-  to_eval <- parse(text = paste0(params$x, condition))
-  
-  output <- normal_model_df %>%
+posterior_probability <- normal_model_df %>%
   mutate(fits_condition = eval(to_eval)) %>%
   tabyl(fits_condition)
-  print(paste0("Probability that ", params$y, " ", condition, " = ", output$percent[2]))
-}
 
+```
+
+The slope found by the model was `r slope_direction`. The probability of getting a slope `r slope_condition` is `r ifelse(is.na(posterior_probability[[3]][2]) , posterior_probability[[3]], posterior_probability[[3]][2])`.
+
+```{r}
+posterior_probability %>%
+  kable(booktabs = T) %>%
+  kable_styling() 
 ```
 
 
 
 
-```{r, echo = length(params$posterior_predict)>0, eval = length(params$posterior_predict)>0}
-knitr::asis_output("## Posterior Predictions")
+```{r, echo = FALSE, eval = length(params$posterior_predict)>0}
+knitr::asis_output("## Posterior Predictions \n")
+
+knitr::asis_output(paste0("Below are the predicted posterior distributions of ", params$y, " when ", params$x, " = the following value(s): "))
+
+knitr::asis_output(paste(params$posterior_predict, collapse = ", "))
+
+```
+
+$~$
+
+```{r, echo = FALSE, eval = length(params$posterior_predict)>0, fig.show = 'hold', out.width = paste0(floor(100/length(params$posterior_predict)), "%")}
+
 
 set.seed(84735)
 
@@ -480,10 +499,11 @@ for(prediction in params$posterior_predict){
   normal_model_sim,
   newdata = data.frame(eval(to_eval)))
 
-  plot <- mcmc_dens(shortcut_prediction) +
-  labs(x = paste0("Predicted ", params$y, " when ", params$x, " = ", prediction))
+  graph <- mcmc_dens(shortcut_prediction) +
+    labs(x = paste0("Predicted ", params$y, " when ", params$x, " = ", prediction)) +     
+    theme(text = element_text(size = 30)) 
   
-  print(plot)
+  print(graph)
 }
 
 ```
@@ -569,8 +589,8 @@ High quality models have the following characteristics:
 
 # To-Do:
 
-1. Add in interpretations of output that are based on the output numbers in cases where they're possible. (And also add in text that describes what each graph is showing!) -- need to do interpretations for posterior probabilities / predictions.
-2. Make the output pretty!
-3. README + sample output HTMLs
-4. See if we can accept things like x = temp_feel instead of x = "temp_feel"
-5. Add in a method of displaying (in the html output) the function that was used to generate the file!
+
+1. README + sample output HTMLs
+2. See if we can accept things like x = temp_feel instead of x = "temp_feel" (highly optional)
+3. Think about removing/changing posterior probability section because it doesn't make much sense right now.
+4. For posterior predictions, consider adding in some visuals to help differentiate between graphs.
