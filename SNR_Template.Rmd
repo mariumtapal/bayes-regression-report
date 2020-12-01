@@ -10,7 +10,7 @@ params:
   x: ""
   y: ""
   n_chains: 4
-  n_iter: 10000
+  n_iter: 5000
   ci_pct: 95
   n_lines: 0
   pred: !r c()
@@ -55,7 +55,7 @@ str(dataset)
 
 #### Number Of Stan Chains: <span style="color:gray">`r params$n_chains`</span>
 
-#### Number Of Iterations Per Chain: <span style="color:gray">`r params$n_iter`</span>
+#### Number Of Iterations Per Chain: <span style="color:gray">`r params$n_iter/2`</span>
 
 #### Credible Interval Percentage: <span style="color:gray">`r params$ci_pct`</span>
 
