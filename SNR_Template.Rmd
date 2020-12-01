@@ -20,7 +20,7 @@ params:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, fig.width = 9, fig.height = 4)
+knitr::opts_chunk$set(echo = FALSE, fig.width = 9, fig.height = 4, warning = FALSE)
 options(scipen = 100)
 library(tidyverse)
 library(rstanarm)
@@ -168,9 +168,7 @@ normal_model_sim <- stan_glm(form,
 ## Visual Diagnostics
 
 
-
 To evaluate the quality of the model, we consider several visual diagnostics: trace plots and chain density overlay plots.
-
 
 
 #### Trace Plots
@@ -189,7 +187,7 @@ What you **DO NOT want** to see:
 
 * Sections where the chain appears to get stuck. These will be visible as breaks in the plot where there is only a horizontal line rather than vertical white noise.
 
-**If the trace plots are of low quality, INCREASE the number of iterations for your Stan model.**
+> If you see any of the above problems, please increase the number of iterations (`n_iter`) until you are satisfied with the model's quality before proceeding.
 
 ```{r}
 # Trace plots of parallel chains
@@ -197,10 +195,7 @@ mcmc_trace(normal_model_sim, size = 0.1)
 ```
 
 
-
 #### Chain Density Overlay Plots
-
-
 
 Chain density overlay plots also help determine whether the simulation was accurate. These show overlaid density plots of the posterior distributions found all of our parameters in each chain.
 
@@ -213,13 +208,13 @@ What you **DO NOT want** to see:
 
 * Chains with different distributions (different peaks, ranges, and/or shapes)
 
-**If the density overlay plots are of low quality, INCREASE the number of iterations for your Stan model.**
+> If you see any of the above problems, please increase the number of iterations (`n_iter`) until you are satisfied with the model's quality before proceeding.
+
 
 ```{r}
 # Density plots of parallel chains
 mcmc_dens_overlay(normal_model_sim)
 ```
-
 
 
 
@@ -295,11 +290,11 @@ n <- (params$n_iter * params$n_chains)
 n_effs_flag <- n_effs_pretty %>%
   mutate(n_iterations = n) %>%
   mutate(ratio = n_eff / n_iterations) %>%
-  mutate(`Suspicious?` = n_eff/n < 0.1)
+  mutate(`Suspicious?` = ifelse(n_eff/n < 0.1, "Yes", "No"))
 
 row.names(n_effs_flag) <- c("(Intercept)", params$x, "sigma")
 
-color.me <- which(n_effs_flag$`Suspicious?` == TRUE)
+color.me <- which(n_effs_flag$`Suspicious?` == "Yes")
 
 n_effs_flag %>%
   kable(booktabs = T) %>%
@@ -307,6 +302,9 @@ n_effs_flag %>%
   row_spec(color.me, bold = T, color = "red")
 ```
 
+```{r, eval = length(color.me) > 0}
+knitr::asis_output("> WARNING: Suspicious values of `n_eff` were found. Please re-run this report, increasing the number of Stan iterations (`n_iter`) until there are no more rows flagged in red, before proceeding. If you proceed with the current model, the rest of the results in this report could be highly misleading.")
+```
 
 
 #### Variability Across vs Within Chains ('Rhat'):
@@ -329,11 +327,11 @@ Rhats_pretty <- df[8]
 Rhats <- df[[8]]
 
 Rhats_flagged <- Rhats_pretty %>% 
-  mutate(`Unstable?` = Rhat > 1.05)
+  mutate(`Unstable?` = ifelse(Rhat > 1.05, "Yes", "No"))
 
 row.names(Rhats_flagged) <- c("(Intercept)", params$x, "sigma")
 
-color.me <- which(Rhats_flagged$`Unstable?` == TRUE)
+color.me <- which(Rhats_flagged$`Unstable?` == "Yes")
 
 Rhats_flagged %>% 
   kable(booktabs = T) %>%
@@ -342,7 +340,9 @@ Rhats_flagged %>%
 
 ```
 
-
+```{r, eval = length(color.me) > 0}
+knitr::asis_output("> WARNING: Suspicious values of `Rhat` were found. Please re-run this report, increasing the number of Stan iterations (`n_iter`) until there are no more rows flagged in red, before proceeding. If you proceed with the current model, the rest of the results in this report could be highly misleading.")
+```
 
 ## Credible Intervals
 
@@ -606,4 +606,3 @@ High quality models have the following characteristics:
 
 1. README + sample output HTMLs
 2. See if we can accept things like x = temp_feel instead of x = "temp_feel" (highly optional)
-3. Consider changing Suspicious/Unstable sections to Yes/No instead of TRUE/FALSE
