@@ -13,7 +13,7 @@ params:
   n_iter: 10000
   ci_pct: 95
   n_lines: 0
-  posterior_predict: !r c()
+  pred: !r c()
   n_folds: 10
   func: ""
   
@@ -62,21 +62,14 @@ str(dataset)
 #### Number Of Potential Regression Lines To Graph: <span style="color:gray">`r num_lines_display`</span>
 
 
-```{r, eval = length(params$posterior_prob)> 0 , echo = FALSE}
-knitr::asis_output("#### Conditions To Check Posterior Probability Of (For Y Variable):")
-
-params$posterior_prob
-
-```
-
-
-
-```{r, eval = length(params$posterior_predict)> 0, echo = FALSE}
+```{r, eval = length(params$pred)> 0, echo = FALSE}
 knitr::asis_output("#### Values For X With Which To Predict Posterior Distributions Of Y: ")
 
-params$posterior_predict
-
+knitr::asis_output(paste0("<span style='color:gray'>", paste(params$pred, collapse = ", "),"</span>"))
 ```
+
+
+
 
 #### Number Of Folds To Use With Cross-Validation: <span style="color:gray">`r params$n_folds`</span>
 
@@ -373,7 +366,7 @@ credible_intervals %>%
 
 
 
-```{r, fig.show = 'hold', out.width = "30%"}
+```{r, fig.show = 'hold', out.width = "33%", fig.height = 6}
 # Shade in the CI. For example:
 
 mcmc_areas(normal_model_sim,
@@ -477,34 +470,55 @@ posterior_probability %>%
 
 
 
-```{r, echo = FALSE, eval = length(params$posterior_predict)>0}
+```{r, echo = FALSE, eval = length(params$pred)>0}
 knitr::asis_output("## Posterior Predictions \n")
 
 knitr::asis_output(paste0("Below are the predicted posterior distributions of ", params$y, " when ", params$x, " = the following value(s): "))
 
-knitr::asis_output(paste(params$posterior_predict, collapse = ", "))
+knitr::asis_output(paste(params$pred, collapse = ", "))
 
 ```
 
 $~$
 
-```{r, echo = FALSE, eval = length(params$posterior_predict)>0, fig.show = 'hold', out.width = paste0(floor(100/length(params$posterior_predict)), "%")}
+```{r, echo = FALSE, eval = length(params$pred)>0, fig.show = 'hold', out.width = paste0(floor(100/length(params$pred)), "%"), fig.height = 6}
 
 
 set.seed(84735)
 
-for(prediction in params$posterior_predict){
+for(prediction in params$pred){
   to_eval <- parse(text = paste0(params$x, " = ", prediction))
   shortcut_prediction <- posterior_predict(
   normal_model_sim,
   newdata = data.frame(eval(to_eval)))
+  
+  ## Customizing ggplot
+
+  prediction_vec <- as.vector(shortcut_prediction)
+  index_max <- which.max(density(prediction_vec)$y)
+  value_max <- density(prediction_vec)$x[index_max]
+  dens_max <- density(prediction_vec)$y[index_max]
+  
+  upper_bound <- quantile(prediction_vec, 0.975)[[1]]
+   
+  lower_bound <- quantile(prediction_vec, 0.025)[[1]]
+  
+  diff <- upper_bound - lower_bound
+  
+  
+
 
   graph <- mcmc_dens(shortcut_prediction) +
-    labs(x = paste0("Predicted ", params$y, " when ", params$x, " = ", prediction)) +     
-    theme(text = element_text(size = 30)) 
+    labs(x = paste0("Most Likely Value: ", as.character(round(value_max, 2))), title = paste0("Predicted ", params$y, " when ", params$x, " = ", prediction)) +   
+    geom_vline(aes(xintercept = value_max), color = "#00134A", size = 1) + 
+    theme(text = element_text(size = 30))
   
   print(graph)
 }
+
+
+
+
 
 ```
 
@@ -592,4 +606,4 @@ High quality models have the following characteristics:
 
 1. README + sample output HTMLs
 2. See if we can accept things like x = temp_feel instead of x = "temp_feel" (highly optional)
-3. For posterior predictions, consider adding in some visuals to help differentiate between graphs.
+3. Consider changing Suspicious/Unstable sections to Yes/No instead of TRUE/FALSE

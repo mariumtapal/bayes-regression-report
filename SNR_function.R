@@ -7,7 +7,7 @@ snr <- function(data,
                 n_iter = 10000,
                 ci_pct = 95,
                 n_lines = 0,
-                posterior_predict = c(),
+                pred = c(),
                 n_folds = 10){
   
   rmarkdown::render("SNR_Template.Rmd", params = list(
@@ -17,7 +17,7 @@ snr <- function(data,
     n_chains = n_chains,
     n_iter = n_iter,
     n_lines = n_lines,
-    posterior_predict = posterior_predict,
+    pred = pred,
     n_folds = n_folds
   ),
   output_file = paste0("SNR_Results_", deparse(substitute(data)), "_", x, "_", y, ".html"))
