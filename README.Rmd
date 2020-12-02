@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-<img src='hex.png' align="right" height="250" hspace="20px"/>
+<img src='Images/hex.png' align="right" height="250" hspace="20px"/>
 
 # bayes-regression-report 
 

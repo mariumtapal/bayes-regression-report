@@ -595,17 +595,3 @@ High quality models have the following characteristics:
 * `within_95` should be around 0.95 (higher values are better).
 
 
-_____
-
-To-Do:
-
-
-1. README + sample output HTMLs
-2. See if we can accept things like x = temp_feel instead of x = "temp_feel" (highly optional)
-3. Get hex sticker looking beautiful. Current code:
-
-```{r, eval = FALSE, echo = FALSE}
-library(hexSticker)
-sticker("bayes.png", package = "", s_x = 1.05, s_width = 0.85, s_y = 1, h_color = "#00134A", h_fill = "#5693C2", url = "Bayesian Regression \n           w/ snr()", u_size = 2.6, u_x = 0.25, u_y = 1.35, filename = "hex.png")
-```
-
