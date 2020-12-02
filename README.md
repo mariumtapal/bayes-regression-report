@@ -4,7 +4,7 @@ Audrey Bertin & Marium Tapal
 Fall 2020
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-<img src='hex.png' align="right" height="250" hspace="20px"/>
+<img src='Images/hex.png' align="right" height="250" hspace="20px"/>
 
 # bayes-regression-report
 
