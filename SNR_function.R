@@ -16,6 +16,7 @@ snr <- function(data,
     y = y,
     n_chains = n_chains,
     n_iter = n_iter*2,
+    ci_pct = ci_pct, 
     n_lines = n_lines,
     pred = pred,
     n_folds = n_folds
