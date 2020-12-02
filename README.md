@@ -82,6 +82,8 @@ The `snr()` function is highly customizable, containing the following user-speci
 
 ## Example Uses
 
-### Example 1: Bikes
+#### Example 1: Predicting Bikeshare Ridership Based on Temperature
 
-### Example 2: Penguins
+#### Example 2: Predicting Penguin Body Mass Based on Flipper Length
+
+#### Example 3: Predicting Penguin Bill Depth Based on Bill Length (Using Too Few Model Iterations)
