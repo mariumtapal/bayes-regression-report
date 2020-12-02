@@ -15,7 +15,6 @@ params:
   n_lines: 0
   pred: !r c()
   n_folds: 10
-  func: ""
   
 ---
 
@@ -608,3 +607,4 @@ To-Do:
 
 1. README + sample output HTMLs
 2. See if we can accept things like x = temp_feel instead of x = "temp_feel" (highly optional)
+3. Can we slightly edit the posterior probability of slope section so we can't get outputs saying that the probability is 1? It's never exactly 1.
