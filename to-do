@@ -2,7 +2,7 @@
 To-Do:
 
 
-1. README + sample output HTMLs
+1. README + sample output HTMLs (just need to add section at bottom about which bits are customized for each report)
 2. See if we can accept things like x = temp_feel instead of x = "temp_feel" (highly optional)
 3. Get hex sticker looking beautiful. Current code below
 
