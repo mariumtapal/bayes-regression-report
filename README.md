@@ -149,3 +149,29 @@ snr(penguins, x = "bill_length_mm", y = "bill_depth_mm", n_iter = 50, ci_pct = 8
 ```
 
 The report produced for this example can be found in the HTML file titled `SNR_Results_penguins_bill_length_mm_bill_depth_mm.html`
+
+## Result-Based Report Customization
+
+In addition to variation based on user input, the HTML files created by `snr()` can also vary based on the results of the analysis. Here are a few cool ways in which you can see this behavior:
+
+#### Red Flags
+
+The mathematical diagnostics sections `Number of Effective Iterations` and `Variability Across vs Within Chains` warn the user when the diagnostics reported within are outside of the boundaries for what can be considered good quality.
+
+-   Each of these two sections contains a table summarizing certain measures of model quality. Each table has a column that contains a Yes/No marker stating whether each row is within a certain threshold or whether it exceeds it. When a row exceeds the threshold, it highlights in bold red.
+
+-   For each of the two tables, if any of the rows end up highlighting in red because they exceed the threshold, an additional warning message is output, providing instructions (and a word of caution) to the user.
+
+This behavior can be seen in the output file for the third example above! In this example, too few iterations are used, resulting in a low quality model. Both mathematical diagnostics tables have rows highlighted in red and both display the corresponding warning message. If you look at any of the other examples, where the models are high quality, there will be no red rows or warning messages.
+
+#### Slope Direction
+
+The `Posterior Probability of Calculated Slope` section determines the direction of the provided slope and uses that information to determine which test it should run, i.e. should it test for the probability of a positive or negative slope?
+
+You can see this difference when comparing the output from example three and example two. In example two, the calculated slope is positive. Therefore the report tests for the probability of receiving a positive slope. However, in example three, the calculated slope is negative. This time, you can see that the report tests for the probability of receiving a negative slope.
+
+#### Posterior Prediction
+
+For the `Posterior Predictions` section (an optional section which appears only if the user specifically calls it), the report analyzes the distributions calculated for each prediction and finds the most likely value. It then plots this value with a line and reports it below the plot.
+
+If you look at the first two example reports, which both contain posterior predictions, you can see that the graphs all have different most likely values plotted and listed.

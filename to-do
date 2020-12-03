@@ -4,10 +4,14 @@ To-Do:
 
 1. README + sample output HTMLs (just need to add section at bottom about which bits are customized for each report)
 2. See if we can accept things like x = temp_feel instead of x = "temp_feel" (highly optional)
-3. Get hex sticker looking beautiful. Current code below
+3. Get hex sticker looking beautiful. Old code with a title:
 
 library(hexSticker)
 sticker("bayes.png", package = "", s_x = 1.05, s_width = 0.85, s_y = 1, h_color = "#00134A", h_fill = "#5693C2", url = "Bayesian Regression \n           w/ snr()", u_size = 2.6, u_x = 0.25, u_y = 1.35, filename = "hex.png")
+
+Code with no title:
+
+ sticker("Images/bayes.png", package = "", s_x = 1.05, s_width = 0.9, s_y = 1.1, h_color = "#00134A", h_fill = "#5693C2", filename = "Images/hex.png")
 
 
 
