@@ -14,5 +14,13 @@ Code with no title:
  sticker("Images/bayes.png", package = "", s_x = 1.05, s_width = 0.9, s_y = 1.1, h_color = "#00134A", h_fill = "#5693C2", filename = "Images/hex.png")
 
 
+4. Final submission is in a pdf format. We could just add the required information including twitter handles onto the REAME, knit it to a pdf instead of a github doc and submit that. 
+
+The instructions for submission (as on moodle) are:
+
+You can submit a pdf with your project write up or a pdf with links to the appropriate webpages. Also please submit a file in which you declare if you:
+1.) Are alright with your project being shared with the rest of the class
+2.) Are alright with your project being shared on the internet (if so, please include twitter handles if you have them)
+
 
 
