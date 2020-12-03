@@ -1,12 +1,10 @@
-SDS 390 Project: Simple Normal Regression Analysis
+Simple Normal Regression with snr():
 ================
-Audrey Bertin & Marium Tapal
-Fall 2020
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 <img src='Images/hex.png' align="right" height="250" hspace="20px"/>
 
-# bayes-regression-report
+### Automating the process of analysis Bayes huge dividends by dramatically reducing coding time.
 
 This project attempts to automate and greatly simplify the process of conducting a Bayesian Simple Normal Regression in R, allowing users to generate an entire customized analysis--including information such as model quality, proposed regression lines, posterior predictions, and more--using only a single line of code.
 
@@ -16,16 +14,16 @@ In order for the regression report to function properly, users must first ensure
 
 Available on CRAN:
 
--   `tidyverse`
--   `rstanarm`
--   `bayesplot`
--   `reshape2`
--   `janitor`
--   `kableExtra`
+-   `bayesplot` \[[CRAN](https://CRAN.R-project.org/package=bayesplot), [GitHub](https://github.com/stan-dev/bayesplot)\]
+-   `janitor` \[[CRAN](https://cran.r-project.org/package=janitor), [GitHub](https://github.com/sfirke/janitor)\]
+-   `kableExtra` \[[CRAN](https://cran.r-project.org/package=kableExtra), [GitHub](https://github.com/haozhu233/kableExtra)\]
+-   `reshape2` \[[CRAN](https://cran.r-project.org/package=reshape2), [GitHub](https://github.com/hadley/reshape)\]
+-   `rstanarm` \[[CRAN](https://CRAN.R-project.org/package=rstanarm), [GitHub](https://github.com/stan-dev/rstanarm)\]
+-   `tidyverse` \[[CRAN](https://CRAN.R-project.org/package=tidyverse), [GitHub](https://github.com/tidyverse/tidyverse)\]
 
 Available on GitHub:
 
--   `bayesrules` ("mdogucu/bayesrules")
+-   `bayesrules` \[[GitHub](https://github.com/mdogucu/bayesrules)\]
 
 The following code can be used to install all of the dependencies at once.
 
@@ -175,3 +173,12 @@ You can see this difference when comparing the output from example three and exa
 For the `Posterior Predictions` section (an optional section which appears only if the user specifically calls it), the report analyzes the distributions calculated for each prediction and finds the most likely value. It then plots this value with a line and reports it below the plot.
 
 If you look at the first two example reports, which both contain posterior predictions, you can see that the graphs all have different most likely values plotted and listed.
+
+------------------------------------------------------------------------
+
+## Contributors
+
+Project Co-Creators:
+
+-   [Audrey Bertin](https://github.com/ambertin)
+-   [Marium Tapal](https://github.com/mariumtapal)

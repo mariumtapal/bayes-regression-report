@@ -4,23 +4,15 @@ To-Do:
 
 1. Check over README to see if anything else needs to be added
 2. See if we can accept things like x = temp_feel instead of x = "temp_feel" (highly optional)
-3. Get hex sticker looking beautiful. Old code with a title:
-
-library(hexSticker)
-sticker("bayes.png", package = "", s_x = 1.05, s_width = 0.85, s_y = 1, h_color = "#00134A", h_fill = "#5693C2", url = "Bayesian Regression \n           w/ snr()", u_size = 2.6, u_x = 0.25, u_y = 1.35, filename = "hex.png")
-
-Code with no title:
-
- sticker("Images/bayes.png", package = "", s_x = 1.05, s_width = 0.9, s_y = 1.1, h_color = "#00134A", h_fill = "#5693C2", filename = "Images/hex.png")
+3. Add a tiny section to the README with links to contributers/package dependencies
+4. Draft up our final PDF submission
 
 
-4. Final submission is in a pdf format. We could just add the required information including twitter handles onto the REAME, knit it to a pdf instead of a github doc and submit that. 
+Questions for Miles:
 
-The instructions for submission (as on moodle) are:
+1. What is the best/recommended way for us to submit the project? A pdf with a link to the repository (and a summary of the files within)?
 
-You can submit a pdf with your project write up or a pdf with links to the appropriate webpages. Also please submit a file in which you declare if you:
-1.) Are alright with your project being shared with the rest of the class
-2.) Are alright with your project being shared on the internet (if so, please include twitter handles if you have them)
+2. What kind of stuff should we add to our README? Maybe a short summary of motivation for the project
 
-
+3. Order of sections in the output. Currently, they just follow the order in the textbook/the order we learned them. Is there a more logical order?
 
