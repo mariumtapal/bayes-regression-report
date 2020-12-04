@@ -6,12 +6,20 @@ To-Do:
 2. See if we can accept things like x = temp_feel instead of x = "temp_feel" (highly optional)
 3. Draft up our final PDF submission
 
+-- pass it off to someone else to see if they have any suggestions for improvements
+
 
 Questions for Miles:
 
 1. What is the best/recommended way for us to submit the project? A pdf with a link to the repository (and a summary of the files within)?
 
+-- pdf with link to repo and instructions of which order miles should look @ stuff
+
 2. What kind of stuff should we add to our README? Maybe a short summary of motivation for the project
+
+-- maybe a short summary of parameterized reports and their utility
+-- in which situations you'd use it
+-- add a note about how we decided when things are too extreme
 
 3. Order of sections in the output. Currently, they just follow the order in the textbook/the order we learned them. Is there a more logical order?
 
