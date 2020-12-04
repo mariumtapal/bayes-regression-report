@@ -3,6 +3,17 @@ To-Do:
 
 
 1. Check over README to see if anything else needs to be added
+
+Marium (all of these sections go at the beginning):
+* Adding to motivation (why you want to use this -- why we chose to do it)
+* How it works (function that calls parameterized report + what is a paramerized report and why is it cool)
+* Conditions you need to have in your dataset for the report to actually work
+
+Audrey:
+* Note about where the cutoffs came from for Rhat and N_eff
+* Future work section explaining extention to multiple regression and why we're not doing it
+
+
 2. See if we can accept things like x = temp_feel instead of x = "temp_feel" (highly optional)
 3. Draft up our final PDF submission
 
@@ -20,6 +31,10 @@ Questions for Miles:
 -- maybe a short summary of parameterized reports and their utility
 -- in which situations you'd use it
 -- add a note about how we decided when things are too extreme
+-- add a note about why we decided to not do multiple regression
+
+
+
 
 3. Order of sections in the output. Currently, they just follow the order in the textbook/the order we learned them. Is there a more logical order?
 
