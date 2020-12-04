@@ -10,8 +10,7 @@ Marium (all of these sections go at the beginning):
 * Conditions you need to have in your dataset for the report to actually work
 
 Audrey:
-* Note about where the cutoffs came from for Rhat and N_eff
-* Future work section explaining extention to multiple regression and why we're not doing it
+DONE
 
 
 2. See if we can accept things like x = temp_feel instead of x = "temp_feel" (highly optional)

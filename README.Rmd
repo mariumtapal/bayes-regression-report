@@ -1,5 +1,5 @@
 ---
-title: "Simple Normal Regression with snr():"
+title: "Simple Normal Regression Reports with snr():"
 output: github_document
 ---
 
@@ -12,16 +12,38 @@ knitr::opts_chunk$set(
 )
 ```
 
-<img src='Images/hex.png' align="right" height="250" hspace="20px"/>
+<img src='Utility-Files/hex.png' align="right" height="250" hspace="20px"/>
 
 ### Automating the process of analysis Bayes huge dividends by dramatically reducing coding time.
 
-This project attempts to automate and greatly simplify the process of conducting a Bayesian Simple Normal Regression in R, allowing users to generate an entire customized analysis--including information such as model quality, proposed regression lines, posterior predictions, and more--using only a single line of code.
+This project attempts to automate and greatly simplify the process of conducting a Bayesian Simple Normal Regression in R, allowing users to generate an entire report containing a fully customized analysis--including information such as model quality, proposed regression lines, posterior predictions, and more--using only a single line of code.
+
+$~$
 
 
-## Dependencies
+> ## What is this?
 
-In order for the regression report to function properly, users must first ensure that the following packages are installed in their RStudio:
+ 
+ 
+$~$
+
+> ## Why is it useful?
+
+
+ 
+$~$ 
+ 
+> ## How does it work?
+
+ 
+ 
+$~$ 
+ 
+> ## What do I need to do to install and run it?
+
+#### Dependencies
+
+In order for the regression report to function properly, you must first ensure that the following packages are installed in your RStudio:
 
 
 Available on CRAN:
@@ -51,7 +73,22 @@ remotes::install_github("mdogucu/bayesrules")
 
 ```
 
-## Report Features
+#### Operating the Report
+
+Once all of the required dependencies are installed, you can start building reports using the following steps:
+
+1. Clone and open this GitHub repository locally.
+2. Run the all the code in the file `SNR_function.R`. This file contains the definition for the `snr()` function used to generate reports.
+3. Load the dataset that you want to run regression on into your `R` environment.
+4. Identify the explanatory varible `x` and response variable `y` that you would like to use.
+5. Run the `snr()` function (see examples below) and specify your desired parameters.
+6. After the function finishes executing, an HTML file containing your report should appear. It will be named according to the data and x/y variables that were called in `snr()`. To open this file, click on it and select `View in Web Browser`.
+
+
+$~$
+ 
+> ## What kind of output can I expect in the report?
+
 
 The report created by the `snr()` function contains a variety of different sections summarizing different aspects of the provided model. These are:
 
@@ -65,18 +102,10 @@ The report created by the `snr()` function contains a variety of different secti
 8. **Evaluating Prediction Quality:** this section considers three different methods (two visual and one mathematical) to help analyze the quality of predictions that can be produced by the calculated model. 
 
 
-## Operating the Report
+$~$
+ 
+> ## How can I customize my reports to show what I want?
 
-Once all of the required dependencies are installed, take the following steps to install the report software:
-
-1. Clone and open this GitHub repository locally.
-2. Run the all the code in the file `SNR_function.R`.
-3. Load your dataset in your environment.
-4. Identify the explanatory varible `x` and response variable `y` that you would like to use.
-5. Run the `snr()` function (see examples below) and specify your desired parameters.
-6. After the function finishes executing, an HTML file should appear. It will be named according to the data and x/y variables that were called in `snr()`. To open this file, click on it and select `View in Web Browser`.
-
-## Customizing the Report Output
 
 The `snr()` function is highly customizable, containing the following user-specifiable parameters:
 
@@ -96,9 +125,13 @@ The `snr()` function is highly customizable, containing the following user-speci
 - `pred`: Values of the `x` variable to use for posterior prediction of `y`. Accepts a vector for multiple values. (DEFAULT: An empty vector. No predictions are made unless specified by the user).
 - `n_folds`: Number of folds for Cross Validation checks (DEFAULT: 10 Folds).
 
-## Example Uses
 
-In this section, we'll consider several examples of how the `snr()` function can be used on real data. We've included two datasets to help illustrate this: `bikes.csv`, which contains information about bikeshare rentals in Washington, D.C. and `penguins.csv`, which contains details about penguins in Antarctica.
+$~$
+ 
+> ## What are some examples of how this might be used?
+
+
+In this section, we'll consider several examples of how the `snr()` function can be used on real data. We've included two datasets to help illustrate this: `bikes.csv`, which contains information about bikeshare rentals in Washington, D.C. and `penguins.csv`, which contains details about penguins in Antarctica. Both of these datasets are located in the `Examples` folder.
 
 #### Example 1: Predicting Bikeshare Ridership Based on Temperature
 
@@ -124,7 +157,7 @@ snr(bikes, x = "temp_feel", y = "rides", n_iter = 1000, ci_pct = 90, n_lines = 1
 
 ```
 
-The report produced for this example can be found in the HTML file titled `SNR_Results_bikes_temp_feel_rides.html`.
+The report produced for this example can be found the `Examples` folder under the HTML file titled `SNR_Results_bikes_temp_feel_rides.html`.
 
 #### Example 2: Predicting Penguin Body Mass Based on Flipper Length
 
@@ -170,7 +203,9 @@ snr(penguins, x = "bill_length_mm", y = "bill_depth_mm", n_iter = 50, ci_pct = 8
 The report produced for this example can be found in the HTML file titled `SNR_Results_penguins_bill_length_mm_bill_depth_mm.html`
 
 
-## Result-Based Report Customization
+$~$
+ 
+> ## What report features should I look out for?
 
 In addition to variation based on user input, the HTML files created by `snr()` can also vary based on the results of the analysis. Here are a few cool ways in which you can see this behavior:
 
@@ -184,6 +219,18 @@ The mathematical diagnostics sections `Number of Effective Iterations` and `Vari
 
 This behavior can be seen in the output file for the third example above! In this example, too few iterations are used, resulting in a low quality model. Both mathematical diagnostics tables have rows highlighted in red and both display the corresponding warning message. If you look at any of the other examples, where the models are high quality, there will be no red rows or warning messages.
 
+> How were the boundaries determined?
+
+To determine the boundaries/thresholds for model quality, we used the guidelines discussed in Chapter 6 of the *Bayes Rules* textbook written by Drs. Alicia Johnson, Miles Ott, and Mine Dogucu (Chapters 1-5 are currently available [here](https://www.bayesrulesbook.com) and additional chapters will be available in the future). 
+
+In this book, the authors argue for the following thresholds:
+
+1. We should probably be suspicious of markov chains for which `N_eff` is less than 10% of the actual sample size `N`.
+2. `R_hat` ratios bigger than 1.05 indicate that we should be concerned about the stability of the simulation.
+
+Our flagging system uses the same limits. `N_eff` rows highlight red if `N_eff` is less than 10% of the combined number of iterations across all of our chains and `R_hat` rows highlight red if their `R_hat` value is > 1.05.
+
+
 #### Slope Direction
 
 The `Posterior Probability of Calculated Slope` section determines the direction of the provided slope and uses that information to determine which test it should run, i.e. should it test for the probability of a positive or negative slope?
@@ -196,9 +243,22 @@ For the `Posterior Predictions` section (an optional section which appears only 
 
 If you look at the first two example reports, which both contain posterior predictions, you can see that the graphs all have different most likely values plotted and listed.
 
+$~$
+
+> ## Why can I not do multiple regression with this tool?
+
+Extending this software to be able to handle multiple regression is not a particularly complicated task. However, several factors have led us to the decision of sticking purely with simple regression for the moment:
+
+1. Simple regression allows us to include more visual plots that help us understand our model since we are only looking at data in two dimensions. A lot of the visual plots in the report would not be possible with multiple regression. Since we are focused in this project in showing a wide variety of ways to visualize and analyze Bayesian regression results, we thought that simple regression provided the best way to do so.
+
+2. For every dimension added to the input model, computation time necessary to produce the report increases at an exponential rate. This project is intended purely to be a proof of concept to show that the automation of Bayesian analysis can be done in a very simple and user-friendly way. Since the code for multiple regression is so similar, extending the project to more dimensions would not add anything in terms of proof of concept, but it would add a huge amount of time and frustration to the testing process.
+
+**If you would like to see a multiple regression version added, though, please let us know. If there is enough interest, we will certainly consider adding it to this project!**
+
+
 ____
 
-## Contributors
+#### Contributors
 
 Project Co-Creators:
 

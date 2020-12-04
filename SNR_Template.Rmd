@@ -266,8 +266,7 @@ if(slope > 0){
 $$\hat{\text{`r params$y`}} = `r intercept` `r slope` * \text{`r params$x`}$$
 
 
-#### Number of Effective Iterations ('n_eff'):
-
+#### Number of Effective Iterations / Effective Sample Size ('n_eff'):
 
 
 N_eff quantifies the number of independent samples it would take to produce an equivalently accurate posterior approximation as created by the Stan model.
