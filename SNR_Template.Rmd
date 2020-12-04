@@ -33,7 +33,7 @@ dataset <- na.omit(params$data)
 
 
 if(params$n_lines == 0){
-  num_lines_display <- round(nrow(dataset)/4)
+  num_lines_display <- min(round(nrow(dataset)/4), params$n_iter/4)
 }else{
   num_lines_display <- params$n_lines
 }
@@ -405,17 +405,19 @@ normal_model_df <- as.array(normal_model_sim) %>%
 
 
 if(params$n_lines == 0){
-  num_lines <- round(nrow(dataset)/4)
+  num_lines <- min(round(nrow(dataset)/4), params$n_iter/4)
 }else{
   num_lines <- params$n_lines
 }
 
-first_n <- head(normal_model_df, num_lines)
+set.seed(84735)
+
+first_n <- sample_n(normal_model_df, num_lines)
 intercept <- model_summary[1][1]
 slope <- model_summary[2][1]
 ```
 
-Below is a plot of the first `r num_lines` potential regression lines proposed by the model (plotted in medium blue) alongside the mean proposed regression line (plotted in dark blue):
+Below is a plot of `r num_lines` potential regression lines proposed by the model (plotted in medium blue) alongside the mean proposed regression line (plotted in dark blue):
 
 ```{r}
 
@@ -429,7 +431,7 @@ ggplot(dataset, aes_string(x = params$x, y = params$y)) +
       # issue here: have to access the x variable from the first_20 df not main df?
       slope = params$x
       ),
-    color = "#5693C2", alpha = .8, size = 0.1
+    color = "#5693C2", alpha = .8, size = 0.2
   )+
   geom_abline(aes(intercept = intercept, slope = slope),
     color = "#00134A"

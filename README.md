@@ -75,7 +75,7 @@ The `snr()` function is highly customizable, containing the following user-speci
 -   `n_chains`: Number of chains to use in the stan model (DEFAULT: 4 Chains).
 -   `n_iter`: Number of iterations to use in the stan model (DEFAULT: 5000 Iterations).
 -   `ci_pct`: The certainty level (percentage) to use when creating Credible Intervals for the parameters of interest--intercept, slope, and deviation--entered as a whole number (DEFAULT: 95 (95%)).
--   `n_lines`: Number of proposed regression lines determined by the model to visualize. (DEFAULT: 1/4 the number of rows in provided dataset.)
+-   `n_lines`: Number of proposed regression lines determined by the model to visualize. (DEFAULT: Whichever value is smaller--1/4 the number of rows in provided dataset or 1/2 the number of iterations)
 -   `pred`: Values of the `x` variable to use for posterior prediction of `y`. Accepts a vector for multiple values. (DEFAULT: An empty vector. No predictions are made unless specified by the user).
 -   `n_folds`: Number of folds for Cross Validation checks (DEFAULT: 10 Folds).
 
