@@ -21,21 +21,29 @@ This project attempts to automate and greatly simplify the process of conducting
 $~$
 
 
-> ## What is this?
+> ## What is this and why is it useful?
 
+The motivation behind automating a Bayesian Simple Normal Regression is to eliminate the process of writing long code when one is first learning the topic and focus on the underlying concepts. In this project, we aim to summarize and create a big picture for your proposed analysis. This automated report does all the necessary diagnostics and tests for you to have a good understanding of your Bayesian Simple Normal Regression model. 
+
+If your first model does not work, don't worry! You can simply can change your explanatory and response variables as needed, without having to re-write the code or copy-paste-edit it, and obtain a second model to compare with. And repeat as many times as needed. Moreover, the report will give you red flags if your model does't look great!
+
+Our reports are also highly customizable. With our `snr()` function, you can tell the function, for example, how many iterations you want in your stan model, or the number of folds used for cross-validation checks. But if you don't want to specify, we have thoughtful defaults built-in.
+
+Another cool reason to use our automated reports is for the ease of use. In Bayesian Simple Normal Regression in R, the functions that are used are spread across many packages including `rstan`, `rstanarm`, `bayesplot`, `bayesrules` and data cleaning tools such as the `tidyverse`. By using this report, you don't have to dig into these packages to find the relevant functions and figure out how to use them!
+
+$~$ 
  
- 
-$~$
+> ## What conditions do I need in my dataset for the analysis to work?
 
-> ## Why is it useful?
+Not a lot actually! You just need a dataset that has at least two numeric (i.e. integer or double) variables. One variable is the response and the other, the explanatory variable.
 
-
- 
 $~$ 
  
 > ## How does it work?
 
- 
+Our `snr()` function uses a parameterized R Markdown report to generate the analysis. When you call the function, the arguments you specify get passed on to our template file (called `SNR_Template.Rmd` and can be found it in the files pane). Then, these arguments (parameters) are accessed in the template file as how you would normally use any variable to generate the customized report.
+
+`snr()` is really just a wrapper  on `rmarkdown::render()`. We created this function so that generating the automated analysis reports is as simple as possible!
  
 $~$ 
  
@@ -80,7 +88,7 @@ Once all of the required dependencies are installed, you can start building repo
 1. Clone and open this GitHub repository locally.
 2. Run the all the code in the file `SNR_function.R`. This file contains the definition for the `snr()` function used to generate reports.
 3. Load the dataset that you want to run regression on into your `R` environment.
-4. Identify the explanatory varible `x` and response variable `y` that you would like to use.
+4. Identify the explanatory variable `x` and response variable `y` that you would like to use.
 5. Run the `snr()` function (see examples below) and specify your desired parameters.
 6. After the function finishes executing, an HTML file containing your report should appear. It will be named according to the data and x/y variables that were called in `snr()`. To open this file, click on it and select `View in Web Browser`.
 
@@ -225,7 +233,7 @@ To determine the boundaries/thresholds for model quality, we used the guidelines
 
 In this book, the authors argue for the following thresholds:
 
-1. We should probably be suspicious of markov chains for which `N_eff` is less than 10% of the actual sample size `N`.
+1. We should probably be suspicious of Markov chains for which `N_eff` is less than 10% of the actual sample size `N`.
 2. `R_hat` ratios bigger than 1.05 indicate that we should be concerned about the stability of the simulation.
 
 Our flagging system uses the same limits. `N_eff` rows highlight red if `N_eff` is less than 10% of the combined number of iterations across all of our chains and `R_hat` rows highlight red if their `R_hat` value is > 1.05.
