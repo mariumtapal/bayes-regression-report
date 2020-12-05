@@ -23,13 +23,31 @@ $~$
 
 > ## What is this and why is it useful?
 
-The motivation behind automating a Bayesian Simple Normal Regression is to eliminate the process of writing long code when one is first learning the topic and focus on the underlying concepts. In this project, we aim to summarize and create a big picture for your proposed analysis. This automated report does all the necessary diagnostics and tests for you to have a good understanding of your Bayesian Simple Normal Regression model. 
+This project contains two key components:
 
-If your first model does not work, don't worry! You can simply can change your explanatory and response variables as needed, without having to re-write the code or copy-paste-edit it, and obtain a second model to compare with. And repeat as many times as needed. Moreover, the report will give you red flags if your model does't look great!
+1. An R Markdown template file that contains code to generate all the steps of a Bayesian Simple Regression, alongside text and other tools to help make it easily interpretable (`SNR_Template.Rmd`)
 
-Our reports are also highly customizable. With our `snr()` function, you can tell the function, for example, how many iterations you want in your stan model, or the number of folds used for cross-validation checks. But if you don't want to specify, we have thoughtful defaults built-in.
+2. A function, called `snr()`, which allows you to pass specific inputs--the details of the model that you want to build, plus some more specifics about what the analysis should look like--to the R Markdown template, generating custom outputs/reports.
 
-Another cool reason to use our automated reports is for the ease of use. In Bayesian Simple Normal Regression in R, the functions that are used are spread across many packages including `rstan`, `rstanarm`, `bayesplot`, `bayesrules` and data cleaning tools such as the `tidyverse`. By using this report, you don't have to dig into these packages to find the relevant functions and figure out how to use them!
+The template and function combined allow the user to automate the process of Simple Normal Regression. Rather than writing 100+ lines of code to run each step individually, you can create an entire report using just 1 line.
+
+There are several benefits to this automation process which motivated our choice to build this tool: 
+
+- It allows users to skip the process of writing long code, which can be quite tedious.
+
+- Automation brings the focus on the underlying concepts, rather than on the details of the coding process. 
+
+- The report structure allows users to see all of the different steps of Bayesian regression in one place. Often, in textbooks and courses, the regression analysis process is taught step by step. While this is very helpful for understanding what is happening in each piece, it can sometimes be hard for students to understand what's happening unless they also get a sense of the bigger picture. Seeing everything about a model in one spot can make it a lot easier to see how the pieces all fit together and get a better sense of the overall quality of your model.
+
+- Our report contains lots of features to help users interpret their models. For each section, we provide insights as to what you should be looking for and which things you don't want to see in the results. We also have tools like a flagging system, which visually warn users (via colors and warning messages) when their model is low quality. This sort of walkthrough of the analysis process can be really useful in the process of learning Bayesian Simple Normal Regression. Coding the traditional way does not provide that same benefit.
+
+- It makes it really easy for users to make changes to their models. Rather than looking through 100+ lines of code to find all the lines where they need to edit something to make the desired adjustment, they can just change one parameter in the input function--for example, their x variable--and immediately re-generate their report. 
+
+- Sometimes it can be hard to decide all of the specifics of what you want to see in your output, especially for new users. How many chain iterations should you have? How many folds for cross-validation? What percentage for your credible intervals? That's a lot of decisions, and a lot of people just getting started might have no idea! Using the automation method via a function helps with this indecision by providing meaningful default values. If you only want to provide an x and y variable and your data, that's totally fine! `snr()` will decide a good number of chain iterations and folds, plus a reasonable credible interval percentage, for you!
+
+- It makes it really easy to compare models side by side. If you want to compare models, just generate a report for one then another report for the next and open them next to each other. Since each report is calculated the exact same way, you can directly compare the identical sections of report and see which model performs better in which aspects.
+
+- Another cool reason to use our automated reports is for the ease of use. In Bayesian Simple Normal Regression in R, the functions that are used are spread across many packages including `rstan`, `rstanarm`, `bayesplot`, `bayesrules` and data cleaning tools such as the `tidyverse`. By using this report, you don't have to dig into these packages to find the relevant functions and figure out how to use them!
 
 $~$ 
  
@@ -41,9 +59,19 @@ $~$
  
 > ## How does it work?
 
-Our `snr()` function uses a parameterized R Markdown report to generate the analysis. When you call the function, the arguments you specify get passed on to our template file (called `SNR_Template.Rmd` and can be found it in the files pane). Then, these arguments (parameters) are accessed in the template file as how you would normally use any variable to generate the customized report.
+Our `snr()` function knits a [parameterized R Markdown report](https://rmarkdown.rstudio.com/developer_parameterized_reports.html%23parameter_types%2F) template file (called `SNR_Template.Rmd`) to generate the analysis. 
 
-`snr()` is really just a wrapper  on `rmarkdown::render()`. We created this function so that generating the automated analysis reports is as simple as possible!
+This report has a special coding style which allows it to accept inputs and produce different outputs depending on what is provided. Rather than looking like traditional code, where all of the variables must be defined (e.g. `ggplot(data = bikes, aes(x = temp_feel, y = rides)) + geom_point()`), the code in this report is written in a way where it can accept variable parameters (e.g. `ggplot(data = params$data, aes_string(x = params$x, y = params$y) + geom_point()`).
+
+When you call the `snr()` function, it passes the arguments you specify to the R Markdown template, which then uses those arguments in its code.
+
+Let's consider the example code from above. If our template contains the code `ggplot(data = params$data, aes_string(x = params$x, y = params$y) + geom_point()` and you call `snr(data = bikes, x = "temp_feel", y = "rides")`, then your template is passed `bikes` for `params$data`, `"temp_feel"` for `params$x`, and `"rides"` for `params$y`, then compiled. As the file is knit, the ggplot code turns into: `ggplot(data = bikes, aes_string(x = "temp_feel", y = "rides")) + geom_point()` and executes just the same way as if you'd run `ggplot(data = bikes, aes(x = temp_feel, y = rides))` in a normal R Markdown file.
+
+`snr()` is really just a wrapper  on `rmarkdown::render()`. We created this function so that generating the automated analysis reports is as simple as possible (and so that we can create custom output file names)!
+
+____
+
+ *Note that `aes_string` in the example just means that the aesthetics accept strings instead of names--parameterized reports don't like to accept data set column names, like `temp_feel`, unless they're structured as strings, `"temp_feel"`.*
  
 $~$ 
  
@@ -86,10 +114,15 @@ remotes::install_github("mdogucu/bayesrules")
 Once all of the required dependencies are installed, you can start building reports using the following steps:
 
 1. Clone and open this GitHub repository locally.
+
 2. Run the all the code in the file `SNR_function.R`. This file contains the definition for the `snr()` function used to generate reports.
+
 3. Load the dataset that you want to run regression on into your `R` environment.
+
 4. Identify the explanatory variable `x` and response variable `y` that you would like to use.
+
 5. Run the `snr()` function (see examples below) and specify your desired parameters.
+
 6. After the function finishes executing, an HTML file containing your report should appear. It will be named according to the data and x/y variables that were called in `snr()`. To open this file, click on it and select `View in Web Browser`.
 
 
@@ -101,12 +134,19 @@ $~$
 The report created by the `snr()` function contains a variety of different sections summarizing different aspects of the provided model. These are:
 
 1. **Analysis Inputs:** summary of the inputs provided for the report
+
 2. **Plot of X & Y:** a scatterplot of the `x` and `y` variables
+
 3. **Visual Diagnostics:** trace plots and chain density overlay plots to check the quality of the model
+
 4. **Posterior Summary Statistics and Mathematical Diagnostics:** mean regression equation provided by the model, plus some mathematical (non-visual) diagnostics--number of effective iterations and variability across vs. within chains--to further check model quality.
+
 5. **Credible Intervals:** this section shows credible intervals (of specified level) for each of the main parameters of interest-- intercept, slope, and deviation.
+
 6. **Plot of Potential Regression Lines Determined By Model:** visual plot showing a sample of regression lines found in the `stan` model on top of the original data.
+
 7. **Posterior Probability of Calculated Slope:** the probability of the true posterior slope being in the direction it was found to be by the model (e.g. if the calculated slope is positive, the probability that the true slope is positive. If the calculated slope is negative, the probability that the true slope is negative.) This provides a sort of hypothesis test for the model.
+
 8. **Evaluating Prediction Quality:** this section considers three different methods (two visual and one mathematical) to help analyze the quality of predictions that can be produced by the calculated model. 
 
 
@@ -120,17 +160,24 @@ The `snr()` function is highly customizable, containing the following user-speci
 #### Parameters Which MUST Be Specified
 
 - `data`: the dataset to be used in the analysis. In order for `snr()` to execute properly, this dataset must be saved as an R object.  
+
 - `x`: the x variable to use. Should be a numeric variable. (enter as a character string, e.g. "age")
+
 - `y`: the y variable to use.  Should be a numeric variable. (enter as a character string, e.g. "height")
 
 
 #### Optional Parameters
 
 - `n_chains`: Number of chains to use in the stan model (DEFAULT: 4 Chains).
+
 - `n_iter`: Number of iterations to use in the stan model (DEFAULT: 5000 Iterations).
+
 - `ci_pct`: The certainty level (percentage) to use when creating Credible Intervals for the parameters of interest--intercept, slope, and deviation--entered as a whole number (DEFAULT: 95 (95%)).
+
 - `n_lines`: Number of proposed regression lines determined by the model to visualize. (DEFAULT: Whichever value is smaller--1/4 the number of rows in provided dataset or 1/2 the number of iterations)
+
 - `pred`: Values of the `x` variable to use for posterior prediction of `y`. Accepts a vector for multiple values. (DEFAULT: An empty vector. No predictions are made unless specified by the user).
+
 - `n_folds`: Number of folds for Cross Validation checks (DEFAULT: 10 Folds).
 
 
@@ -234,6 +281,7 @@ To determine the boundaries/thresholds for model quality, we used the guidelines
 In this book, the authors argue for the following thresholds:
 
 1. We should probably be suspicious of Markov chains for which `N_eff` is less than 10% of the actual sample size `N`.
+
 2. `R_hat` ratios bigger than 1.05 indicate that we should be concerned about the stability of the simulation.
 
 Our flagging system uses the same limits. `N_eff` rows highlight red if `N_eff` is less than 10% of the combined number of iterations across all of our chains and `R_hat` rows highlight red if their `R_hat` value is > 1.05.
