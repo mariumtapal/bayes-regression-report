@@ -49,6 +49,8 @@ There are several benefits to this automation process which motivated our choice
 
 - Another cool reason to use our automated reports is for the ease of use. In Bayesian Simple Normal Regression in R, the functions that are used are spread across many packages including `rstan`, `rstanarm`, `bayesplot`, `bayesrules` and data cleaning tools such as the `tidyverse`. By using this report, you don't have to dig into these packages to find the relevant functions and figure out how to use them!
 
+- Finally, building this report serves as a proof of concept, illustrating all of the cool things you can do when automating the stages of statistical analysis. We hope that this report can provide some inspiration for others, encouraging the development of other useful---and hopefully even educational---tools!
+
 $~$ 
  
 > ## What conditions do I need in my dataset for the analysis to work?
