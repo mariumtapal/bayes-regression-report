@@ -1,0 +1,47 @@
+---
+title: "Bayesian Analysis - Final Project Submission"
+author: "Audrey Bertin and Marium Tapal"
+date: "12/8/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Simple Normal Regression Reports with `snr()`
+
+### *Automating the process of analysis Bayes huge dividends by dramatically reducing coding time.*
+
+$~$
+
+**Quick Summary:**
+
+Our project attempts to automate the process of Bayesian Simple Normal Regression as described in Chapters 9 and 10 of *Bayes Rules* by providing users with a function that enables the generation of customized, detailed, and educational regression reports.
+
+$~$
+
+**Link to Access:**
+
+All of the components necessary to use this project, in addition to more details about the motivation and methodology behind it, are hosted on GitHub at the following link:
+
+https://github.com/mariumtapal/bayes-regression-report
+
+$~$
+
+**Instructions for Viewing the Project:**
+
+The GitHub repository contains several files/folders that will be needed to understand and use our reports. These are:
+
+1. A `README` that contains information about the motivation and methodology of the project, instructions for use, sample cases, and other details about the functionality. **We recommend that you read this first!** It should be easily accessible as it shows up on the front page when clicking the GitHub link.
+
+2. The `Examples` folder contains the output files created by several different potential uses of our function, which are described in detail in the `README`, as well as the data we used to create them. **We recommend that you look at the files in this folder as you read the relevant examples in the README.**
+
+3. The file `SNR_function.R` contains the code defining the function used to create our reports. **If you want to test the report generation yourself, you should run all of the code in this file before doing so! Additional instructions for using the report are contained in the README, so read those first.**
+
+4. The template file `SNR_Template.Rmd` contains the template for our reports. **Look at this file if you want to see the code behind our report automation.**
+
+**You can ignore the `Utility-Files` folder completely! This was just used for us to store things like the hex sticker :)**
+
+

@@ -1,4 +1,4 @@
-Simple Normal Regression Reports with snr():
+Simple Normal Regression Reports with snr()
 ================
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->

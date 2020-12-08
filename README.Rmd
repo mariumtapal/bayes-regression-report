@@ -1,5 +1,5 @@
 ---
-title: "Simple Normal Regression Reports with snr():"
+title: "Simple Normal Regression Reports with snr()"
 output: github_document
 ---
 
